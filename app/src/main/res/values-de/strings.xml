@@ -114,10 +114,6 @@
     <string name="backup">Backup</string>
     <string name="use_google_safe_browsing">Google Safe Browsing aktivieren</string>
     <string name="block_all_third_party_requests">Alle Drittanbieter-Anfragen blockieren</string>
-    <string name="sandbox">Sandbox</string>
-    <string name="no_sandbox">Sandbox nicht verwenden.</string>
-    <string name="all_sandboxes_used">Alle Sandboxen sind in Verwendung.</string>
-    <string name="enable_sandbox">Sandbox aktivieren</string>
     <string name="show_fullscreen">Vollbildmodus</string>
     <string name="site_not_found">Seite konnte nicht geladen werden.</string>
     <string name="icon_not_found">Icon konnte nicht geladen werden.</string>

@@ -99,7 +99,6 @@ public class DataManager {
         String json = gson.toJson(websites);
         editor.putString(shared_pref_webappdata, json);
         editor.putInt(shared_pref_max_id, max_assigned_ID);
-        if (SandboxManager.getInstance() != null) editor.putInt(shared_pref_next_container, SandboxManager.getInstance().getNextContainer());
         editor.apply();
     }
 
@@ -162,7 +161,6 @@ public class DataManager {
         }
 
         max_assigned_ID = appdata.getInt(shared_pref_max_id, max_assigned_ID);
-        if (SandboxManager.getInstance() != null) SandboxManager.getInstance().setNextContainer(appdata.getInt(shared_pref_next_container, 0));
 
         //Check legacy global settings
         if (appdata.getBoolean(shared_pref_global_settings_json, false)) {

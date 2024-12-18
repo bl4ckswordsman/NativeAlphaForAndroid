@@ -54,17 +54,6 @@ import java.util.regex.Pattern;
 public final class Utility {
     private static final String TAG = "XXX";
 
-    public static void killWebSandbox(int id) {
-        ActivityManager activityManager =
-                (ActivityManager) App.getAppContext().getSystemService(Context.ACTIVITY_SERVICE);
-
-        for (ActivityManager.RunningAppProcessInfo processInfo : activityManager.getRunningAppProcesses()) {
-            if (processInfo.processName.contains("web_sandbox_" + id)) {
-                android.os.Process.killProcess(processInfo.pid);
-            }
-        }
-    }
-
     public static void deleteShortcuts(List<Integer> removableWebAppIds) {
         ShortcutManager manager = App.getAppContext().getSystemService(ShortcutManager.class);
         for (ShortcutInfo info : manager.getPinnedShortcuts()) {

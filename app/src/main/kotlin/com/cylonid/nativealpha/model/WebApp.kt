@@ -41,6 +41,8 @@ class WebApp {
     var isShowExpertSettings = false
     var isSafeBrowsing = false
     var isBlockThirdPartyRequests = false
+    var containerId: Int = Const.NO_CONTAINER
+    var isUseContainer = false
     var isDrmAllowed = false
     var isShowFullscreen = false
     var isKeepAwake = false
@@ -73,6 +75,8 @@ class WebApp {
         ID = other.ID
         baseUrl = other.baseUrl
         isOverrideGlobalSettings = other.isOverrideGlobalSettings
+        containerId = other.containerId
+        isUseContainer = other.isUseContainer
         copySettings(other)
     }
 

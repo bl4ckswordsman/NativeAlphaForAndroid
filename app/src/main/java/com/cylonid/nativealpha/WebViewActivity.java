@@ -62,7 +62,6 @@ import androidx.webkit.WebViewFeature;
 import com.cylonid.nativealpha.helper.BiometricPromptHelper;
 import com.cylonid.nativealpha.helper.IconPopupMenuHelper;
 import com.cylonid.nativealpha.model.DataManager;
-import com.cylonid.nativealpha.model.SandboxManager;
 import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.Const;
 import com.cylonid.nativealpha.util.EntryPointUtils;
@@ -140,19 +139,6 @@ public class WebViewActivity extends AppCompatActivity implements EasyPermission
                 WebViewLauncher.startWebViewInNewProcess(webapp, this);
             }
 
-            if (!packageName.equals(processName) && SandboxManager.getInstance() != null) {
-                if (SandboxManager.getInstance().isSandboxUsedByAnotherApp(webapp)) {
-                    SandboxManager.getInstance().unregisterWebAppFromSandbox(webapp.getContainerId());
-                    WebViewLauncher.startWebViewInNewProcess(webapp, this);
-                }
-                try {
-                    SandboxManager.getInstance().registerWebAppToSandbox(webapp);
-                    WebView.setDataDirectorySuffix(webapp.getContainerId() + webapp.getAlphanumericBaseUrl() + "_" + webapp.getID());
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                }
-            }
-
         }
         setContentView(R.layout.full_webview);
 
@@ -167,7 +153,7 @@ public class WebViewActivity extends AppCompatActivity implements EasyPermission
 
         if (webapp.isUseAdblock()) {
             wv.setVisibility(View.GONE);
-            wv = findViewById(R.id.adblockwebview);
+            // wv = findViewById(R.id.adblockwebview);
             wv.setVisibility(View.VISIBLE);
         }
         String fieldName = Stream.of(WebViewActivity.class.getDeclaredFields()).filter(f -> f.getType() == WebView.class).findFirst().orElseThrow(null).getName();
@@ -354,7 +340,6 @@ public class WebViewActivity extends AppCompatActivity implements EasyPermission
         });
     }
 
-    @SuppressLint("RequiresFeature")
 
     @SuppressLint("NonConstantResourceId")
     private void showWebViewPopupMenu() {
@@ -848,7 +833,6 @@ public class WebViewActivity extends AppCompatActivity implements EasyPermission
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            runOnUiThread(() -> setDarkModeIfNeeded());
             String url = request.getUrl().toString();
             WebApp webapp = DataManager.getInstance().getWebApp(webappID);
 

@@ -167,5 +167,3 @@ public class WebAppSettingsActivity extends AppCompatActivity {
 
     }
 }
-
-

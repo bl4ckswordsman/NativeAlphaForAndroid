@@ -132,6 +132,7 @@ dependencies {
     implementation "androidx.biometric:biometric:1.1.0"
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.2.0'
     implementation "androidx.fragment:fragment-ktx:1.8.2"
+    implementation 'com.caverock:androidsvg-aar:1.4'
 
     kapt "com.android.databinding:compiler:3.1.4"
 

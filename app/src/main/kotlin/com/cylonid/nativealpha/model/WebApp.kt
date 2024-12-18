@@ -276,14 +276,6 @@ class WebApp {
         if (isChecked) expertSettings.visibility = View.VISIBLE else expertSettings.visibility = View.GONE
     }
 
-    fun onSwitchSandboxChanged(mSwitch: CompoundButton?, isChecked: Boolean) {
-        containerId = if (isChecked) {
-            SandboxManager.getInstance().calculateNextFreeContainerId()
-        } else {
-            Const.NO_CONTAINER
-        }
-    }
-
     fun onSwitchOverrideGlobalSettingsChanged(mSwitch: CompoundButton, isChecked: Boolean) {
         val sectionDetailedWebAppSettings = mSwitch.rootView.findViewById<LinearLayout>(R.id.sectionWebAppDetailSettings)
         Utility.setViewAndChildrenEnabled(sectionDetailedWebAppSettings, isChecked)

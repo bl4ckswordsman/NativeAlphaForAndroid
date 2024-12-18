@@ -19,14 +19,14 @@
             android:focusableInTouchMode="true"
             tools:ignore="MissingConstraints" />
 
-        <org.adblockplus.libadblockplus.android.webview.AdblockWebView
+        <!-- <org.adblockplus.libadblockplus.android.webview.AdblockWebView
             android:id="@+id/adblockwebview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            tools:ignore="MissingConstraints" />
+            tools:ignore="MissingConstraints" /> -->
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"

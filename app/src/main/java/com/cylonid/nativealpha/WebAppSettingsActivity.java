@@ -127,12 +127,10 @@ public class WebAppSettingsActivity extends AppCompatActivity {
 
     private void setPlusSettings(View v) {
         LinearLayout secDarkMode = v.findViewById(R.id.sectionDarkmode);
-        LinearLayout secSandbox= v.findViewById(R.id.sectionSandbox);
         LinearLayout secKiosk = v.findViewById(R.id.sectionKioskMode);
         LinearLayout secAccessRestriction = v.findViewById(R.id.sectionAccessRestriction);
         if (!BuildConfig.FLAVOR.equals("extended")) { 
             secDarkMode.setVisibility(View.GONE);
-            secSandbox.setVisibility(View.GONE);
             secKiosk.setVisibility(View.GONE);
             secAccessRestriction.setVisibility(View.GONE);
         }
@@ -157,7 +155,6 @@ public class WebAppSettingsActivity extends AppCompatActivity {
         findViewById(R.id.txtWebAppName).setVisibility(View.GONE);
         findViewById(R.id.switchOverrideGlobal).setVisibility(View.GONE);
         findViewById(R.id.sectionSSL).setVisibility(View.GONE);
-        findViewById(R.id.sectionSandbox).setVisibility(View.GONE);
         findViewById(R.id.labelTitle).setVisibility(View.GONE);
         findViewById(R.id.labelEditableBaseUrl).setVisibility(View.GONE);
         findViewById(R.id.textBaseUrl).setVisibility(View.GONE);
@@ -167,5 +164,3 @@ public class WebAppSettingsActivity extends AppCompatActivity {
 
     }
 }
-
-

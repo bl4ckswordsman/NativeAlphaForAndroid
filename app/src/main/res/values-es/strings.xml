@@ -120,10 +120,6 @@
     <string name="backup">Copia de seguridad</string>
     <string name="use_google_safe_browsing">Utilizar la navegación segura de Google</string>
     <string name="block_all_third_party_requests">Bloquear todas las solicitudes de terceros</string>
-    <string name="sandbox">Sandbox</string>
-    <string name="no_sandbox">No usar la sandbox.</string>
-    <string name="all_sandboxes_used">Todas las sandboxes están en uso actualmente.</string>
-    <string name="enable_sandbox">Habilitar Sandbox</string>
     <string name="show_fullscreen">Pantalla completa (modo inmersivo)</string>
     <string name="site_not_found">No se ha podido cargar la página.</string>
     <string name="icon_not_found">No se ha podido cargar el icono.</string>

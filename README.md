@@ -1,4 +1,3 @@
-
 # <img src="graphics/logo.png" width="50px" alt=""></img> Native Alpha
 ![OS](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white&style=plastic)
 ![OS](https://img.shields.io/badge/MinVersion-8.0-red)
@@ -22,15 +21,7 @@
 [![IzzyOnDroid Download Badge](graphics/IzzyOnDroid.png)](https://apt.izzysoft.de/fdroid/index/apk/com.cylonid.nativealpha)
 [![APK Download Badge](graphics/apk_badge.png)](https://github.com/cylonid/NativeAlphaForAndroid/releases/download/v1.4.0/NativeAlpha-standard-universal-release-v1.4.0.apk)
 [![Google Play Download Badge](graphics/google_play.png)](https://play.google.com/store/apps/details?id=com.cylonid.nativealpha)
-### Paid Download
-[![Google Play Download Badge](graphics/google_play.png)](https://play.google.com/store/apps/details?id=com.cylonid.nativealpha.pro)
 
-## Paid Features
-  * Sandbox containers: Web Apps are loaded in fully separated sandboxes, cookies or other data are not shared with other Web Apps
-  * Kiosk Mode: Fullscreen with menubars hidden
-  * Biometric Access Protection: For every Web App, you can enable access protection (Fingerprint + fallback to lockscreen PIN)
-  * Experimental "Force Dark Mode" also available for websites (configurable with respect to day-time)
-  
 ## Latest Changes (v1.4.0)
 
 * Order of Web Apps in menu can be changed
@@ -38,12 +29,6 @@
 * Native Alpha custom context menu can be deactived so that the standard browser context menu is shown
 * Italian translation added
 * General, technical version updates
-
-### Native Alpha Plus
-
-* Biometric Access Protection: For every Web App, you can enable access protection (Fingerprint + fallback to lockscreen PIN)
-* Further enhancements for Dark Mode
-
 
 ## FAQ
 *Q: Why would I need this app if any mobile browser can do the same?*

@@ -1,4 +1,6 @@
 package com.cylonid.nativealpha;
+import com.caverock.androidsvg.SVG;
+import android.graphics.Canvas;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -149,22 +151,54 @@ public class ShortcutDialogFragment extends DialogFragment  {
         return dialog;
     }
 
-    private Bitmap loadBitmap(String strUrl)  {
-        Bitmap bitmap;
-        try {
-            URL url = new URL(strUrl);
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
-            InputStream is = con.getInputStream();
-            bitmap = BitmapFactory.decodeStream(is);
-            if (bitmap == null || bitmap.getWidth() < Const.FAVICON_MIN_WIDTH)
-                return null;
+private Bitmap loadSvg(String strUrl) {
+    try {
+        URL url = new URL(strUrl);
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        InputStream is = con.getInputStream();
 
-        } catch (Exception e) {
-            bitmap = null;
-            e.printStackTrace();
+        SVG svg = SVG.getFromInputStream(is);
+        float width = svg.getDocumentWidth();
+        float height = svg.getDocumentHeight();
+
+        // Use default size if dimensions not specified
+        if (width <= 0 || height <= 0) {
+            width = height = 192; // Standard icon size
         }
+
+        Bitmap bitmap = Bitmap.createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        svg.renderToCanvas(canvas);
+
         return bitmap;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
     }
+}
+
+private Bitmap loadBitmap(String strUrl) {
+    try {
+        URL url = new URL(strUrl);
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        String contentType = con.getContentType();
+
+        // Handle SVG content
+        if (contentType != null && contentType.contains("svg")) {
+            return loadSvg(strUrl);
+        }
+
+        // Handle regular image formats
+        InputStream is = con.getInputStream();
+        Bitmap bitmap = BitmapFactory.decodeStream(is);
+        if (bitmap == null || bitmap.getWidth() < Const.FAVICON_MIN_WIDTH)
+            return null;
+        return bitmap;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
     private TreeMap<Integer, String> buildIconMap() {
         TreeMap<Integer, String> found_icons = new TreeMap<>();
         if(base_url == null || base_url.equals("")) return found_icons;
@@ -287,6 +321,18 @@ public class ShortcutDialogFragment extends DialogFragment  {
                 }
             }
 
+            // Step 4: Search common subdirectories for icons
+            if (found_icons.isEmpty()) {
+                String[] commonPaths = {"/favicon.ico", "/static/favicon.ico", "/assets/favicon.ico", "/favicon.png", "/static/favicon.png", "/assets/favicon.png"};
+                for (String path : commonPaths) {
+                    String iconUrl = base_url + path;
+                    if (isValidIcon(iconUrl)) {
+                        found_icons.put(1, iconUrl);
+                        break;
+                    }
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -294,10 +340,22 @@ public class ShortcutDialogFragment extends DialogFragment  {
         if (!found_icons.isEmpty()) {
             Map.Entry<Integer, String> best_fit = found_icons.lastEntry();
             result[Const.RESULT_IDX_FAVICON] = best_fit.getValue();
-
         }
 
         return result;
+    }
+
+    private boolean isValidIcon(String url) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("HEAD");
+            int responseCode = connection.getResponseCode();
+            String contentType = connection.getContentType();
+            return (responseCode == HttpURLConnection.HTTP_OK &&
+                    (contentType.equals("image/x-icon") || contentType.equals("image/png") || contentType.equals("image/svg+xml")));
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private void startFaviconFetching() {

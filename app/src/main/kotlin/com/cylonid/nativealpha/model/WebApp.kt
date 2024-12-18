@@ -41,8 +41,6 @@ class WebApp {
     var isShowExpertSettings = false
     var isSafeBrowsing = false
     var isBlockThirdPartyRequests = false
-    var containerId: Int = Const.NO_CONTAINER
-    var isUseContainer = false
     var isDrmAllowed = false
     var isShowFullscreen = false
     var isKeepAwake = false
@@ -75,8 +73,6 @@ class WebApp {
         ID = other.ID
         baseUrl = other.baseUrl
         isOverrideGlobalSettings = other.isOverrideGlobalSettings
-        containerId = other.containerId
-        isUseContainer = other.isUseContainer
         copySettings(other)
     }
 
@@ -274,14 +270,6 @@ class WebApp {
     fun onSwitchExpertSettingsChanged(mSwitch: CompoundButton, isChecked: Boolean) {
         val expertSettings = mSwitch.rootView.findViewById<LinearLayout>(R.id.sectionExpertSettings)
         if (isChecked) expertSettings.visibility = View.VISIBLE else expertSettings.visibility = View.GONE
-    }
-
-    fun onSwitchSandboxChanged(mSwitch: CompoundButton?, isChecked: Boolean) {
-        containerId = if (isChecked) {
-            SandboxManager.getInstance().calculateNextFreeContainerId()
-        } else {
-            Const.NO_CONTAINER
-        }
     }
 
     fun onSwitchOverrideGlobalSettingsChanged(mSwitch: CompoundButton, isChecked: Boolean) {

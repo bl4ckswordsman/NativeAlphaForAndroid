@@ -53,6 +53,7 @@ class WebApp {
     var isAllowMediaPlaybackInBackground = false
     var order = 0
     var alwaysUseFallbackContextMenu = false
+    var isImmersiveTopBar = true
 
     constructor(url: String, id: Int, order: Int) {
         title = url.replace("http://", "").replace("https://", "").replace("www.", "")
@@ -77,6 +78,7 @@ class WebApp {
         isOverrideGlobalSettings = other.isOverrideGlobalSettings
         containerId = other.containerId
         isUseContainer = other.isUseContainer
+        isImmersiveTopBar = other.isImmersiveTopBar
         copySettings(other)
     }
 

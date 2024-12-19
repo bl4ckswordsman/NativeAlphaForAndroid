@@ -10,6 +10,7 @@ import android.webkit.CookieManager;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.Switch;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -159,6 +160,14 @@ public class SettingsActivity extends EdgeToEdgeActivity {
 
         btnCancel.setOnClickListener(v -> {
             onBackPressed();
+        });
+
+        // Add a Switch to toggle password auto-fill
+        Switch switchPasswordAutofill = findViewById(R.id.switchPasswordAutofill);
+        switchPasswordAutofill.setChecked(modified_settings.isPasswordAutoFillEnabled());
+        switchPasswordAutofill.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            modified_settings.setPasswordAutoFillEnabled(isChecked);
+            DataManager.getInstance().setSettings(modified_settings);
         });
     }
 }

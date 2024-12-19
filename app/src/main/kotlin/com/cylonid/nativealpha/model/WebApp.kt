@@ -51,6 +51,10 @@ class WebApp {
     var isEnableZooming = false
     var isBiometricProtection = false
     var isAllowMediaPlaybackInBackground = false
+    private var _allowPasswordAutofill = false
+    var allowPasswordAutofill: Boolean
+        get() = _allowPasswordAutofill
+        set(value) { _allowPasswordAutofill = value }
     var order = 0
     var alwaysUseFallbackContextMenu = false
 
@@ -115,6 +119,7 @@ class WebApp {
         isEnableZooming = other.isEnableZooming
         isBiometricProtection = other.isBiometricProtection
         isAllowMediaPlaybackInBackground = other.isAllowMediaPlaybackInBackground
+        _allowPasswordAutofill = other._allowPasswordAutofill
         order = other.order
         alwaysUseFallbackContextMenu = other.alwaysUseFallbackContextMenu
     }

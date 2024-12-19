@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -188,6 +189,26 @@ public class WebViewActivity
             .getUserAgentString()
             .replace("; " + fieldName, "");
         wv.getSettings().setUserAgentString(uaString);
+        // Configure password autofill
+        if (
+            webapp.getAllowPasswordAutofill() ||
+            (!webapp.isOverrideGlobalSettings() &&
+                DataManager.getInstance()
+                    .getSettings()
+                    .isAllowPasswordAutofill())
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                wv.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
+                wv.getSettings().setJavaScriptEnabled(true);
+                wv.getSettings().setDomStorageEnabled(true);
+                wv.getSettings().setDatabaseEnabled(true);
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                wv.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+            }
+        }
+
         if (webapp.isUseCustomUserAgent()) {
             if (
                 webapp.getUserAgent() != null &&
@@ -1074,6 +1095,16 @@ public class WebViewActivity
     }
 
     private class CustomBrowser extends WebViewClient {
+/*
+        @Override
+        public void onFormResubmission(
+            WebView view,
+            Message dontResend,
+            Message resend
+        ) {
+            resend.sendToTarget();
+        }
+*/
 
         @Override
         public void onPageFinished(WebView view, String url) {

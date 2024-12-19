@@ -18,6 +18,8 @@
             android:focusable="true"
             android:forceDarkAllowed="false"
             android:focusableInTouchMode="true"
+            android:importantForAutofill="yes"
+            android:autofillHints="password"
             tools:ignore="MissingConstraints" />
 
         <!-- <org.adblockplus.libadblockplus.android.webview.AdblockWebView

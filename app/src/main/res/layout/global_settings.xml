@@ -146,6 +146,12 @@
                             android:layout_height="wrap_content"
                             android:checked="@={settings.alwaysShowSoftwareButtons}"
                             android:text="@string/always_show_software_buttons" />
+                        <Switch
+                            android:id="@+id/switchGlobalPasswordAutofill"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checked="@={settings.allowPasswordAutofill}"
+                            android:text="@string/allow_password_autofill" />
 
 
                     </LinearLayout>

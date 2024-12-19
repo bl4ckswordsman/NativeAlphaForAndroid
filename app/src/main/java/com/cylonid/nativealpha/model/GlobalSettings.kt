@@ -10,6 +10,7 @@ class GlobalSettings {
     var themeId: Int
     var globalWebApp: WebApp
     var alwaysShowSoftwareButtons: Boolean
+    var isAllowPasswordAutofill: Boolean
 
     constructor(other: GlobalSettings) {
         this.isClearCache = other.isClearCache
@@ -21,6 +22,8 @@ class GlobalSettings {
         this.isShowProgressbar = other.isShowProgressbar
         this.globalWebApp = other.globalWebApp
         this.alwaysShowSoftwareButtons = other.alwaysShowSoftwareButtons
+isAllowPasswordAutofill = other.isAllowPasswordAutofill
+        this.isAllowPasswordAutofill = other.isAllowPasswordAutofill
     }
 
     constructor() {
@@ -33,6 +36,8 @@ class GlobalSettings {
         isShowProgressbar = false
         globalWebApp = WebApp("about:blank", Int.MAX_VALUE)
         alwaysShowSoftwareButtons = false
+isAllowPasswordAutofill = false
+        isAllowPasswordAutofill = false
     }
 
     fun setClearCookies(clear_cookies: Boolean) {

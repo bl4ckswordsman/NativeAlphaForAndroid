@@ -4,7 +4,7 @@ import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.Const;
 import com.cylonid.nativealpha.util.Utility;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
 
@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  */
 public class UtilUnitTests {
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void getWidthFromHTMLElementString() {
         assertEquals((Integer)192, Utility.getWidthFromIcon("192x192"));
     }
@@ -36,23 +36,23 @@ public class UtilUnitTests {
         testShortcutHelper("https://orf.at", "https://orf.at/mojo/1_4_1/storyserver//common/images/favicons/favicon-128x128.png", Const.RESULT_IDX_FAVICON);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void faviconNull() {
         testShortcutHelper("https://tugraz.at", null, Const.RESULT_IDX_FAVICON);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void faviconNonExistingSite() {
         testShortcutHelper("https://asdfasdfasdfasdf.asdfsdaf", null, Const.RESULT_IDX_FAVICON);
     }
 
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void getStartUrlFromWebManifest() {
         testShortcutHelper("https://online.tugraz.at", "https://online.tugraz.at/tug_online/ee/ui/ca2/app/desktop/#/login", Const.RESULT_IDX_NEW_BASEURL);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void getWebAppTitleFromManifest() {
         testShortcutHelper("https://online.tugraz.at", "TUGRAZonline Go", Const.RESULT_IDX_TITLE);
     }

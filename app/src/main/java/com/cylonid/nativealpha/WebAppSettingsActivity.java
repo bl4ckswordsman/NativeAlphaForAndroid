@@ -159,6 +159,10 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
                 findViewById(R.id.switchOverrideGlobal),
                 webapp.isOverrideGlobalSettings()
             );
+            webapp.onSwitchPasswordAutofillChanged(
+                findViewById(R.id.switchPasswordAutofill),
+                webapp.isPasswordAutofillEnabled()
+            );
             setPlusSettings(inflated_view);
         }
     }

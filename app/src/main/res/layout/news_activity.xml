@@ -7,20 +7,24 @@
     android:background="@android:color/white"
     android:forceDarkAllowed="false"
     android:id="@+id/news_main">
+
     <View
         android:layout_width="match_parent"
         android:weightSum="100"
-        android:layout_height="1dp"/>
+        android:layout_height="1dp" />
 
-    <ScrollView android:layout_height="wrap_content"
+    <ScrollView
+        android:layout_height="wrap_content"
         android:layout_weight="90"
         android:id="@+id/news_scrollview"
         android:layout_width="match_parent">
+
         <LinearLayout
             android:id="@+id/news_scrollchild"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
+
             <WebView
                 android:id="@+id/news_content"
                 android:layout_weight=".60"
@@ -31,6 +35,7 @@
                 tools:ignore="MissingConstraints" />
         </LinearLayout>
     </ScrollView>
+
     <LinearLayout
         android:id="@+id/header"
         android:layout_weight="10"

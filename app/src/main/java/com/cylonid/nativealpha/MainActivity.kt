@@ -178,7 +178,11 @@ class MainActivity : EdgeToEdgeActivity() {
                     if (!(str_url.startsWith("https://")) && !(str_url.startsWith("http://"))) {
                         str_url = "https://$str_url"
                     }
-                    val newSite = WebApp(str_url, DataManager.getInstance().incrementedID, DataManager.getInstance().incrementedOrder)
+                    val newSite = WebApp(
+                        str_url,
+                        DataManager.getInstance().incrementedID,
+                        DataManager.getInstance().incrementedOrder
+                    )
                     newSite.applySettingsForNewWebApp()
                     DataManager.getInstance().addWebsite(newSite)
 

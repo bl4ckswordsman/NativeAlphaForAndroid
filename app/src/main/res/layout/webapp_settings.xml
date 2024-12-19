@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="webapp"
             type="com.cylonid.nativealpha.model.WebApp" />
 
         <variable
             name="activity"
-            type="com.cylonid.nativealpha.WebAppSettingsActivity"/>
+            type="com.cylonid.nativealpha.WebAppSettingsActivity" />
     </data>
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="false"
@@ -167,6 +167,7 @@
                                 android:checked="@={webapp.microphonePermission}"
                                 android:text="@string/allow_microphone_access" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/sectionAccessRestriction"
                             android:layout_width="match_parent"
@@ -183,6 +184,7 @@
                                 android:text="@string/webapp_section_access_restriction"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
+
                             <Switch
                                 android:id="@+id/switchBiometricAccess"
                                 android:layout_width="match_parent"
@@ -418,6 +420,7 @@
 
                             </LinearLayout>
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/sectionKioskMode"
                             android:layout_width="match_parent"
@@ -502,7 +505,7 @@
                                 android:visibility="gone"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                                                android:checked="@={webapp.allowMediaPlaybackInBackground}"
+                                android:checked="@={webapp.allowMediaPlaybackInBackground}"
                                 android:text="@string/allow_media_playback_in_background" />
 
 
@@ -533,6 +536,7 @@
                             android:orientation="vertical"
                             android:showDividers="middle"
                             android:visibility="gone">
+
                             <TextView
                                 android:id="@+id/labelEditableBaseUrl"
                                 android:layout_width="match_parent"
@@ -541,6 +545,7 @@
                                 android:text="@string/start_url"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
+
                             <EditText
                                 android:id="@+id/textBaseUrl"
                                 android:layout_width="match_parent"

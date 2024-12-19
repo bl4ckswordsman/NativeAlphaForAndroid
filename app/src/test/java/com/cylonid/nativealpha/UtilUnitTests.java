@@ -1,12 +1,12 @@
 package com.cylonid.nativealpha;
 
+import static org.junit.Assert.assertEquals;
+
 import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.Const;
 import com.cylonid.nativealpha.util.Utility;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -17,8 +17,9 @@ public class UtilUnitTests {
 
     @org.junit.jupiter.api.Test
     public void getWidthFromHTMLElementString() {
-        assertEquals((Integer)192, Utility.getWidthFromIcon("192x192"));
+        assertEquals((Integer) 192, Utility.getWidthFromIcon("192x192"));
     }
+
     public void testShortcutHelper(String base_url, final String expected, final int result_index) {
         WebApp webapp = new WebApp(base_url, Integer.MAX_VALUE);
         ShortcutDialogFragment frag = ShortcutDialogFragment.newInstance(webapp);

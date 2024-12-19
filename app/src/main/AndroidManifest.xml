@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.cylonid.nativealpha">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
+    <meta-data
+        android:name="android.webkit.WebView.EnableSafeBrowsing"
         android:value="false" />
 
     <application
@@ -38,7 +39,7 @@
             </intent-filter>
         </activity>
 
-<!--        Make sure to also copy changes to WebViewActivity in build.gradle-->
+        <!--        Make sure to also copy changes to WebViewActivity in build.gradle-->
         <activity
             android:name=".WebViewActivity"
             android:parentActivityName=".MainActivity"
@@ -47,49 +48,48 @@
             android:theme="@style/AppTheme.NoActionBar.Webapp"
             android:configChanges="orientation|screenSize|smallestScreenSize|density|screenLayout|uiMode|keyboard|keyboardHidden|navigation"
             android:launchMode="standard"
-            android:documentLaunchMode="intoExisting"
-            />
- 
+            android:documentLaunchMode="intoExisting" />
+
         <!--Placeholder-->
         <activity
             android:name="com.cylonid.nativealpha.SettingsActivity"
             android:parentActivityName=".MainActivity"
             android:icon="@mipmap/native_alpha"
             android:roundIcon="@mipmap/native_alpha"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name="com.cylonid.nativealpha.WebAppSettingsActivity"
             android:label="@string/app_name"
             android:parentActivityName=".MainActivity"
             android:icon="@mipmap/native_alpha"
             android:roundIcon="@mipmap/native_alpha"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <activity
             android:name="com.cylonid.nativealpha.AboutActivity"
             android:parentActivityName=".MainActivity"
             android:icon="@mipmap/native_alpha"
             android:roundIcon="@mipmap/native_alpha"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <activity
             android:name="com.cylonid.nativealpha.activities.NewsActivity"
             android:parentActivityName=".MainActivity"
             android:icon="@mipmap/native_alpha"
             android:roundIcon="@mipmap/native_alpha"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        <activity android:name="com.mikepenz.aboutlibraries.ui.LibsActivity"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
-        </activity>
+        <activity
+            android:name="com.mikepenz.aboutlibraries.ui.LibsActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"></activity>
 
 
-        <meta-data android:name="com.samsung.android.keepalive.density" android:value="true"/>
-        <meta-data android:name="com.samsung.android.multidisplay.keep_process_alive" android:value="true"/>
+        <meta-data
+            android:name="com.samsung.android.keepalive.density"
+            android:value="true" />
+        <meta-data
+            android:name="com.samsung.android.multidisplay.keep_process_alive"
+            android:value="true" />
         <!--        https://developer.samsung.com/samsung-dex/modify-optimizing.html-->
     </application>
 

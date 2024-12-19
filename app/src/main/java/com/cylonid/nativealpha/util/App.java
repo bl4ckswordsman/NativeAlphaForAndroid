@@ -6,7 +6,8 @@ import android.content.Context;
 
 public class App extends Application {
 
-    @SuppressLint("StaticFieldLeak") //We are using app context which is never deleted during runtime, so this is not a leak per se.
+    @SuppressLint("StaticFieldLeak")
+    //We are using app context which is never deleted during runtime, so this is not a leak per se.
     //https://stackoverflow.com/questions/2002288/static-way-to-get-context-in-android
     private static Context context;
 

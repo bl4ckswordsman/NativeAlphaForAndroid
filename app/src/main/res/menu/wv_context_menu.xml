@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     app:showAsAction="always">
 
     <group android:id="@+id/cmGroupUrl">
-        <item android:title=""
+        <item
+            android:title=""
             android:enabled="false"
             android:id="@+id/cmUrl" />
     </group>
 
     <group android:id="@+id/cmGroupMisc">
-        <item android:title="@string/back"
-              android:id="@+id/cmItemBack"
-              android:icon="@drawable/ic_baseline_arrow_back_24"/>
-        <item android:title="@string/forward"
+        <item
+            android:title="@string/back"
+            android:id="@+id/cmItemBack"
+            android:icon="@drawable/ic_baseline_arrow_back_24" />
+        <item
+            android:title="@string/forward"
             android:id="@+id/cmItemForward"
             android:visible="false"
-            android:icon="@drawable/ic_baseline_arrow_forward_24"/>
+            android:icon="@drawable/ic_baseline_arrow_forward_24" />
 
-        <item android:title="@string/share"
+        <item
+            android:title="@string/share"
             android:id="@+id/cmItemShareUrl"
-            android:icon="@drawable/ic_baseline_share_24"/>
-        <item android:title="@string/reload"
+            android:icon="@drawable/ic_baseline_share_24" />
+        <item
+            android:title="@string/reload"
             android:id="@+id/cmItemReload"
             android:icon="@drawable/ic_baseline_refresh_24" />
-        <item android:title="@string/to_main_menu"
+        <item
+            android:title="@string/to_main_menu"
             android:id="@+id/cmMainMenu"
             android:icon="@drawable/ic_baseline_home_24" />
         <item
@@ -33,16 +38,18 @@
             android:title="@string/more"
             android:icon="@drawable/ic_baseline_more_horiz_24">
             <menu>
-                <item android:title="@string/copy_url"
+                <item
+                    android:title="@string/copy_url"
                     android:id="@+id/cmItemCopyUrl"
-                    android:icon="@drawable/ic_baseline_content_copy_24"/>
-                <item android:title="@string/use_standard_context_menu_temporarily"
+                    android:icon="@drawable/ic_baseline_content_copy_24" />
+                <item
+                    android:title="@string/use_standard_context_menu_temporarily"
                     android:id="@+id/cmFallbackContextmenuTemp"
-                    android:icon="@drawable/baseline_menu_open_24"/>
+                    android:icon="@drawable/baseline_menu_open_24" />
                 <item
                     android:id="@+id/cmItemCloseWebApp"
                     android:icon="@drawable/ic_baseline_exit_to_app_24"
-                    android:title="@string/close_web_app"/>
+                    android:title="@string/close_web_app" />
             </menu>
         </item>
     </group>

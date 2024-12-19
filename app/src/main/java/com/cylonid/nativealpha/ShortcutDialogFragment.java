@@ -1,12 +1,14 @@
 package com.cylonid.nativealpha;
-import com.caverock.androidsvg.SVG;
-import android.graphics.Canvas;
+
+import static androidx.appcompat.app.AppCompatActivity.RESULT_OK;
+import static com.cylonid.nativealpha.util.Const.CODE_OPEN_FILE;
 
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -27,6 +29,7 @@ import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.DialogFragment;
 
+import com.caverock.androidsvg.SVG;
 import com.cylonid.nativealpha.model.DataManager;
 import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.App;
@@ -53,11 +56,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static androidx.appcompat.app.AppCompatActivity.RESULT_OK;
-import static com.cylonid.nativealpha.util.Const.CODE_OPEN_FILE;
 
-
-public class ShortcutDialogFragment extends DialogFragment  {
+public class ShortcutDialogFragment extends DialogFragment {
 
     private WebApp webapp;
     private String base_url;
@@ -67,7 +67,8 @@ public class ShortcutDialogFragment extends DialogFragment  {
     private EditText uiTitle;
     private Thread faviconFetcherThread;
 
-    public ShortcutDialogFragment() {}
+    public ShortcutDialogFragment() {
+    }
 
     public static ShortcutDialogFragment newInstance(WebApp webapp) {
         ShortcutDialogFragment frag = new ShortcutDialogFragment();
@@ -98,8 +99,7 @@ public class ShortcutDialogFragment extends DialogFragment  {
                 if (bitmap != null)
                     applyNewBitmapToDialog();
 
-            }
-            catch(IOException e) {
+            } catch (IOException e) {
                 Utility.showToast(requireActivity(), getString(R.string.icon_not_found), Toast.LENGTH_SHORT);
                 e.printStackTrace();
             }
@@ -120,7 +120,7 @@ public class ShortcutDialogFragment extends DialogFragment  {
                     dismiss();
 
                 })
-                .setNegativeButton(android.R.string.cancel,  (dialog1, which) -> {
+                .setNegativeButton(android.R.string.cancel, (dialog1, which) -> {
                     dismiss();
                 })
                 .create();
@@ -151,57 +151,58 @@ public class ShortcutDialogFragment extends DialogFragment  {
         return dialog;
     }
 
-private Bitmap loadSvg(String strUrl) {
-    try {
-        URL url = new URL(strUrl);
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-        InputStream is = con.getInputStream();
+    private Bitmap loadSvg(String strUrl) {
+        try {
+            URL url = new URL(strUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            InputStream is = con.getInputStream();
 
-        SVG svg = SVG.getFromInputStream(is);
-        float width = svg.getDocumentWidth();
-        float height = svg.getDocumentHeight();
+            SVG svg = SVG.getFromInputStream(is);
+            float width = svg.getDocumentWidth();
+            float height = svg.getDocumentHeight();
 
-        // Use default size if dimensions not specified
-        if (width <= 0 || height <= 0) {
-            width = height = 192; // Standard icon size
-        }
+            // Use default size if dimensions not specified
+            if (width <= 0 || height <= 0) {
+                width = height = 192; // Standard icon size
+            }
 
-        Bitmap bitmap = Bitmap.createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        svg.renderToCanvas(canvas);
+            Bitmap bitmap = Bitmap.createBitmap((int) width, (int) height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            svg.renderToCanvas(canvas);
 
-        return bitmap;
-    } catch (Exception e) {
-        e.printStackTrace();
-        return null;
-    }
-}
-
-private Bitmap loadBitmap(String strUrl) {
-    try {
-        URL url = new URL(strUrl);
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-        String contentType = con.getContentType();
-
-        // Handle SVG content
-        if (contentType != null && contentType.contains("svg")) {
-            return loadSvg(strUrl);
-        }
-
-        // Handle regular image formats
-        InputStream is = con.getInputStream();
-        Bitmap bitmap = BitmapFactory.decodeStream(is);
-        if (bitmap == null || bitmap.getWidth() < Const.FAVICON_MIN_WIDTH)
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
-        return bitmap;
-    } catch (Exception e) {
-        e.printStackTrace();
-        return null;
+        }
     }
-}
+
+    private Bitmap loadBitmap(String strUrl) {
+        try {
+            URL url = new URL(strUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            String contentType = con.getContentType();
+
+            // Handle SVG content
+            if (contentType != null && contentType.contains("svg")) {
+                return loadSvg(strUrl);
+            }
+
+            // Handle regular image formats
+            InputStream is = con.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            if (bitmap == null || bitmap.getWidth() < Const.FAVICON_MIN_WIDTH)
+                return null;
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private TreeMap<Integer, String> buildIconMap() {
         TreeMap<Integer, String> found_icons = new TreeMap<>();
-        if(base_url == null || base_url.equals("")) return found_icons;
+        if (base_url == null || base_url.equals("")) return found_icons;
         String host_part = base_url.replace("http://", "").replace("https://", "").replace("www.", "");
 
         //No suitable icon
@@ -239,7 +240,7 @@ private Bitmap loadBitmap(String strUrl) {
     }
 
     public String[] fetchWebappData() {
-        String[] result = new String[] {null, null, null};
+        String[] result = new String[]{null, null, null};
         TreeMap<Integer, String> found_icons = buildIconMap();
 
         try {
@@ -377,7 +378,9 @@ private Bitmap loadBitmap(String strUrl) {
 
         new CountDownTimer(5000, 5000) {
             @Override
-            public void onTick(long millisUntilFinished) { }
+            public void onTick(long millisUntilFinished) {
+            }
+
             public void onFinish() {
                 faviconFetcherThread.interrupt();
             }
@@ -413,7 +416,7 @@ private Bitmap loadBitmap(String strUrl) {
                     .build();
             String newScId = pinShortcutInfo.getId();
             ShortcutManager scManager = App.getAppContext().getSystemService(ShortcutManager.class);
-            if(!scManager.getPinnedShortcuts().stream().anyMatch(s -> s.getId().equals(newScId))) {
+            if (!scManager.getPinnedShortcuts().stream().anyMatch(s -> s.getId().equals(newScId))) {
                 ShortcutManagerCompat.requestPinShortcut(requireActivity(), pinShortcutInfo, null);
             } else {
                 Utility.showToast(requireActivity(), getString(R.string.shortcut_already_exists));
@@ -424,8 +427,8 @@ private Bitmap loadBitmap(String strUrl) {
 
     private void prepareFailedUI() {
         showFailedMessage();
-        if(webapp.getTitle() != null && !webapp.getTitle().equals("")) {
-          uiTitle.setText(webapp.getTitle());
+        if (webapp.getTitle() != null && !webapp.getTitle().equals("")) {
+            uiTitle.setText(webapp.getTitle());
         }
 
         uiTitle.requestFocus();
@@ -433,6 +436,7 @@ private Bitmap loadBitmap(String strUrl) {
         uiProgressBar.setVisibility(View.GONE);
         uiFavicon.setVisibility(View.VISIBLE);
     }
+
     private void showFailedMessage() {
         Utility.showToast(requireActivity(), getString(R.string.icon_fetch_failed_line1, webapp.getTitle()) + getString(R.string.icon_fetch_failed_line2) + getString(R.string.icon_fetch_failed_line3));
     }
@@ -442,8 +446,7 @@ private Bitmap loadBitmap(String strUrl) {
             if (!shortcut_title.equals(""))
                 uiTitle.setText(shortcut_title);
 
-        }
-        else {
+        } else {
             uiTitle.setText(webapp.getTitle());
         }
         uiTitle.requestFocus();

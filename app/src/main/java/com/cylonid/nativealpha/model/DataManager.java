@@ -1,5 +1,7 @@
 package com.cylonid.nativealpha.model;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Base64;
@@ -29,8 +31,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static android.content.Context.MODE_PRIVATE;
-
 
 public class DataManager {
 
@@ -44,7 +44,7 @@ public class DataManager {
     public static final String DATA_FORMAT = "dataFormat";
 
     private static final String SHARED_PREF_LEGACY_KEY = "GLOBALSETTINGS";
-    private static final String shared_pref_max_id  = "MAX_ID";
+    private static final String shared_pref_max_id = "MAX_ID";
     private static final String shared_pref_next_container = "NEXT_CONTAINER";
 
     private static final String shared_pref_webappdata = "WEBSITEDATA";
@@ -70,14 +70,13 @@ public class DataManager {
 
     private GlobalSettings settings;
 
-    private DataManager()
-    {
+    private DataManager() {
         websites = new ArrayList<>();
         max_assigned_ID = -1;
         settings = new GlobalSettings();
     }
 
-    public static DataManager getInstance(){
+    public static DataManager getInstance() {
         return instance;
     }
 
@@ -141,7 +140,6 @@ public class DataManager {
     }
 
 
-
     public void loadAppData() {
         Utility.Assert(App.getAppContext() != null, "App.getAppContext() null before loading sharedpref");
 
@@ -154,10 +152,12 @@ public class DataManager {
             String json = appdata.getString(shared_pref_webappdata, "");
             int oldDataFormat = DataVersionConverter.getDataFormat(json);
             String currentDataFormattedJson = this.checkDataFormat(oldDataFormat, json);
-            ArrayList<WebApp> new_websites = gson.fromJson(currentDataFormattedJson, new TypeToken<ArrayList<WebApp>>() {}.getType());
+            ArrayList<WebApp> new_websites = gson.fromJson(currentDataFormattedJson, new TypeToken<ArrayList<WebApp>>() {
+            }.getType());
             checkIfWebAppIdsCollide(websites, new_websites);
             websites = new_websites;
-            if(oldDataFormat != DataVersionConverter.getDataFormat(currentDataFormattedJson)) this.saveWebAppData();
+            if (oldDataFormat != DataVersionConverter.getDataFormat(currentDataFormattedJson))
+                this.saveWebAppData();
         }
 
         max_assigned_ID = appdata.getInt(shared_pref_max_id, max_assigned_ID);
@@ -172,12 +172,13 @@ public class DataManager {
                 String json = appdata.getString(shared_pref_globalsettings, "");
                 int oldDataFormat = DataVersionConverter.getDataFormat(json);
                 String currentDataFormattedJson = this.checkDataFormat(oldDataFormat, json);
-                settings = gson.fromJson(currentDataFormattedJson, new TypeToken<GlobalSettings>() {}.getType());
+                settings = gson.fromJson(currentDataFormattedJson, new TypeToken<GlobalSettings>() {
+                }.getType());
                 assertGlobalWebappData();
-                if(oldDataFormat != DataVersionConverter.getDataFormat(currentDataFormattedJson)) this.saveGlobalSettings();
+                if (oldDataFormat != DataVersionConverter.getDataFormat(currentDataFormattedJson))
+                    this.saveGlobalSettings();
             }
-        }
-        else
+        } else
             loadGlobalSettingsLegacy();
     }
 
@@ -205,8 +206,8 @@ public class DataManager {
     }
 
     public void addWebsite(WebApp new_site) {
-            websites.add(new_site);
-            saveWebAppData();
+        websites.add(new_site);
+        saveWebAppData();
     }
 
     public int getIncrementedID() {
@@ -248,8 +249,7 @@ public class DataManager {
                 return webApp;
             }
             return websites.get(i);
-        }
-        catch (IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             Toast toast = Toast.makeText(App.getAppContext(), App.getAppContext().getString(R.string.webapp_not_found), Toast.LENGTH_LONG);
             toast.setGravity(Gravity.TOP, 0, 100);
             toast.show();
@@ -275,9 +275,9 @@ public class DataManager {
 
     public boolean saveSharedPreferencesToFile(Uri uri) {
         boolean result = false;
-        try(FileOutputStream fos = (FileOutputStream) App.getAppContext().getContentResolver().openOutputStream(uri);
-            Base64OutputStream b64os = new Base64OutputStream(fos, Base64.DEFAULT);
-            ObjectOutputStream oos = new ObjectOutputStream(b64os)) {
+        try (FileOutputStream fos = (FileOutputStream) App.getAppContext().getContentResolver().openOutputStream(uri);
+             Base64OutputStream b64os = new Base64OutputStream(fos, Base64.DEFAULT);
+             ObjectOutputStream oos = new ObjectOutputStream(b64os)) {
             appdata = App.getAppContext().getSharedPreferences(SHARED_PREF_KEY, MODE_PRIVATE);
             TreeMap<String, ?> shared_pref_map = new TreeMap<>(appdata.getAll());
 
@@ -291,8 +291,8 @@ public class DataManager {
         return result;
     }
 
-    @SuppressWarnings({ "unchecked" })
-    public boolean loadSharedPreferencesFromFile(Uri uri){
+    @SuppressWarnings({"unchecked"})
+    public boolean loadSharedPreferencesFromFile(Uri uri) {
         boolean result = false;
         try (FileInputStream fis = (FileInputStream) App.getAppContext().getContentResolver().openInputStream(uri);
              Base64InputStream b64is = new Base64InputStream(fis, Base64.DEFAULT);
@@ -333,7 +333,7 @@ public class DataManager {
     }
 
     private String checkDataFormat(int dataFormat, String jsonInput) {
-        switch(dataFormat) {
+        switch (dataFormat) {
             case LEGACY_DATA_FORMAT:
                 String convertedInput = DataVersionConverter.convertToDataFormat(jsonInput, DataVersionConverter.getLegacyTo1300Map());
                 return convertedInput;
@@ -355,6 +355,7 @@ public class DataManager {
         return websites.get(neighbor);
 
     }
+
     public WebApp getPredecessor(int i) {
         int INVALID = -1;
         int neighbor = i;
@@ -370,7 +371,7 @@ public class DataManager {
     private void assertGlobalWebappData() {
         boolean override = settings.getGlobalWebApp().isOverrideGlobalSettings();
         int container = settings.getGlobalWebApp().getContainerId();
-        if(!override || container != Const.NO_CONTAINER) {
+        if (!override || container != Const.NO_CONTAINER) {
             settings.getGlobalWebApp().setOverrideGlobalSettings(true);
             settings.getGlobalWebApp().setContainerId(Const.NO_CONTAINER);
             this.saveGlobalSettings();

@@ -1,8 +1,8 @@
 package com.cylonid.nativealpha.fragments.webapplist
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cylonid.nativealpha.R
@@ -24,7 +24,8 @@ class WebAppListFragment : Fragment(R.layout.fragment_web_app_list) {
         list = view.findViewById(R.id.web_app_list)
         list.layoutManager = LinearLayoutManager(requiredActivity())
         list.adapter = adapter
-        list.orientation = DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
+        list.orientation =
+            DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
         list.dragListener = onItemDragListener
         list.disableSwipeDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
         list.disableSwipeDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)

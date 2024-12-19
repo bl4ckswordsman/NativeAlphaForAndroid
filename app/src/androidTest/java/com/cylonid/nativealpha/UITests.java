@@ -1,22 +1,5 @@
 package com.cylonid.nativealpha;
 
-import androidx.test.espresso.NoMatchingViewException;
-import androidx.test.espresso.web.webdriver.Locator;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.rule.ActivityTestRule;
-
-import com.cylonid.nativealpha.model.DataManager;
-import com.cylonid.nativealpha.model.WebApp;
-
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.actionWithAssertions;
 import static androidx.test.espresso.action.ViewActions.clearText;
@@ -35,12 +18,28 @@ import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.getText;
 import static com.cylonid.nativealpha.TestUtils.dragFromTo;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 
 import android.view.View;
+
+import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.web.webdriver.Locator;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.ActivityTestRule;
+
+import com.cylonid.nativealpha.model.DataManager;
+import com.cylonid.nativealpha.model.WebApp;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -51,7 +50,8 @@ import android.view.View;
 public class UITests {
     @Rule
     public ActivityTestRule<MainActivity> activityTestRule = new ActivityTestRule<>(MainActivity.class);
-//    public ActivityScenarioRule<MainActivity> scenarioRule = new ActivityScenarioRule<>(MainActivity.class);
+
+    //    public ActivityScenarioRule<MainActivity> scenarioRule = new ActivityScenarioRule<>(MainActivity.class);
     @Test
     public void addWebsite() {
         TestUtils.acceptLicense();
@@ -74,7 +74,7 @@ public class UITests {
         initMultipleWebsites(List.of("github.com", "orf.at"));
         onView(TestUtils.getElementFromMatchAtPosition(withId(R.id.dragAnchor), 0)).perform(swipeDown());
         Matcher<View> anchor = TestUtils.getElementFromMatchAtPosition(withId(R.id.dragAnchor), 0);
- 
+
         onView(anchor)
                 .perform(actionWithAssertions(dragFromTo(500)));
         assertEquals(DataManager.getInstance().getWebApp(0).getOrder(), 1);
@@ -107,6 +107,7 @@ public class UITests {
         onWebView(Matchers.allOf(withId(R.id.webview))).withNoTimeout().withElement(findElement(Locator.ID, "detected_value")).check(webMatches(getText(), containsString("Yes")));
 
     }
+
     @Test
     public void badSSLAccept() {
         initSingleWebsite("https://untrusted-root.badssl.com/");
@@ -162,7 +163,6 @@ public class UITests {
         //Get rid of welcome message
         TestUtils.alertDialogDismiss();
     }
-
 
 
 }

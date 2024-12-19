@@ -5,18 +5,18 @@ apply plugin: 'com.mikepenz.aboutlibraries.plugin'
 
 //https://gist.github.com/shakalaca/6422811
 android {
-     applicationVariants.all { variant ->
-         variant.assembleProvider.get().doLast {
-             delete fileTree('src/main/java/com/cylonid/nativealpha') {
-                 include '**/__WebViewActivity_*.java'
-             }
-             delete fileTree('src/main') {
-                 include '**/AndroidManifest.xml'
-             }
-             ant.move(file: 'src/main/AndroidManifest_original.xml', tofile:'src/main/AndroidManifest.xml')
+    applicationVariants.all { variant ->
+        variant.assembleProvider.get().doLast {
+            delete fileTree('src/main/java/com/cylonid/nativealpha') {
+                include '**/__WebViewActivity_*.java'
+            }
+            delete fileTree('src/main') {
+                include '**/AndroidManifest.xml'
+            }
+            ant.move(file: 'src/main/AndroidManifest_original.xml', tofile: 'src/main/AndroidManifest.xml')
 
-         }
-     }
+        }
+    }
 
     compileSdk 35
     splits {
@@ -60,8 +60,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-          applicationIdSuffix = ".debug"
-          resValue "string", "app_name", "_DEBUG-Native Alpha"
+            applicationIdSuffix = ".debug"
+            resValue "string", "app_name", "_DEBUG-Native Alpha"
         }
         applicationVariants.all {
                 // this method is use to rename your release apk only
@@ -145,13 +145,13 @@ dependencies {
 
 }
 def renameManifest = tasks.register("renameManifest") {
-    ant.move(file: 'src/main/AndroidManifest.xml', tofile:'src/main/AndroidManifest_original.xml')
+    ant.move(file: 'src/main/AndroidManifest.xml', tofile: 'src/main/AndroidManifest_original.xml')
 }
 preBuild.dependsOn renameManifest
 
 int NUM_OF_CONTAINERS = 8
 
-def generateWebViewActivities = tasks.register( "extendAndroidManifest", Copy ) {
+def generateWebViewActivities = tasks.register("extendAndroidManifest", Copy) {
     dependsOn(renameManifest)
     from 'src/main/AndroidManifest_original.xml'
     into 'src/main'
@@ -188,7 +188,7 @@ preBuild.dependsOn generateWebViewActivities
         from 'src/main/java/com/cylonid/nativealpha/WebViewActivity.java'
         into "src/main/java/com/cylonid/nativealpha/__WebViewActivity_${i}"
         dependsOn(generateWebViewActivities)
-        mustRunAfter(i == 0 ? [] : tasks.getByName("createWebViewclass${i-1}"))
+        mustRunAfter(i == 0 ? [] : tasks.getByName("createWebViewclass${i - 1}"))
 
         filter { String line ->
             line.replaceAll("WebViewActivity", "__WebViewActivity_${i}")

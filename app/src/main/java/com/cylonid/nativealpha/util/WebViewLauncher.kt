@@ -1,13 +1,13 @@
 package com.cylonid.nativealpha.util
 
 import android.content.Context
-import com.cylonid.nativealpha.model.WebApp
-import androidx.appcompat.app.AppCompatActivity
-import com.cylonid.nativealpha.R
-import com.google.android.material.snackbar.Snackbar
-import com.jakewharton.processphoenix.ProcessPhoenix
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
+import com.cylonid.nativealpha.R
+import com.cylonid.nativealpha.model.WebApp
+import com.google.android.material.snackbar.Snackbar
+import com.jakewharton.processphoenix.ProcessPhoenix
 import java.lang.NullPointerException
 
 object WebViewLauncher {

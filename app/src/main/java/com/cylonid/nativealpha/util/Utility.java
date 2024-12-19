@@ -3,18 +3,12 @@ package com.cylonid.nativealpha.util;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -27,24 +21,18 @@ import android.widget.Toast;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
-import com.cylonid.nativealpha.BuildConfig;
 import com.cylonid.nativealpha.R;
-import com.cylonid.nativealpha.WebViewActivity;
 import com.cylonid.nativealpha.model.DataManager;
-import com.cylonid.nativealpha.model.WebApp;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -59,7 +47,7 @@ public final class Utility {
         for (ShortcutInfo info : manager.getPinnedShortcuts()) {
             int id = info.getIntent().getIntExtra(Const.INTENT_WEBAPPID, -1);
             if (removableWebAppIds.contains(id)) {
-                manager.disableShortcuts(Arrays.asList(info.getId()), App.getAppContext().getString(R.string.webapp_already_deleted));
+                manager.disableShortcuts(List.of(info.getId()), App.getAppContext().getString(R.string.webapp_already_deleted));
             }
         }
     }
@@ -79,13 +67,11 @@ public final class Utility {
         view.setClickable(enabled);
         if (enabled) {
             view.setAlpha(1.0f);
-        }
-        else {
+        } else {
             view.setAlpha(0.75f);
         }
 
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
+        if (view instanceof ViewGroup viewGroup) {
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View child = viewGroup.getChildAt(i);
                 setViewAndChildrenEnabled(child, enabled);
@@ -93,8 +79,7 @@ public final class Utility {
         }
     }
 
-    public static Long getTimeInSeconds()
-    {
+    public static Long getTimeInSeconds() {
         return System.currentTimeMillis() / 1000;
     }
 
@@ -102,11 +87,11 @@ public final class Utility {
     public static SimpleDateFormat getHourMinFormat() {
         return new SimpleDateFormat("HH:mm");
     }
+
     @SuppressLint("SimpleDateFormat")
     public static SimpleDateFormat getDayHourMinuteSecondsFormat() {
-        return new SimpleDateFormat(    "EEE, d MMM yyyy HH:mm:ss Z");
+        return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
     }
-
 
 
     public static Calendar convertStringToCalendar(String str) {
@@ -142,7 +127,6 @@ public final class Utility {
 //        System.out.println("High: " + Utility.getDayHourMinuteSecondsFormat().format(high.getTime()));
 //        System.out.println("Is Before high: " + (middle.before(high)));
 //        System.out.println("Is after low: " + (middle.after(low)));
-
 
 
     public static void Assert(boolean condition, String message) {
@@ -186,7 +170,7 @@ public final class Utility {
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
     }
 
-    public static void writeFileOnInternalStorage(Context mcoContext, String sFileName, String sBody){
+    public static void writeFileOnInternalStorage(Context mcoContext, String sFileName, String sBody) {
 
         try {
             File gpxfile = new File(mcoContext.getExternalFilesDir(null), sFileName);
@@ -194,7 +178,7 @@ public final class Utility {
             writer.append(sBody);
             writer.flush();
             writer.close();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -252,10 +236,9 @@ public final class Utility {
             (
                     @NonNull final Context context,
                     @AttrRes final int attributeColor
-            )
-    {
+            ) {
         final TypedValue value = new TypedValue();
-        context.getTheme ().resolveAttribute (attributeColor, value, true);
+        context.getTheme().resolveAttribute(attributeColor, value, true);
         return value.data;
     }
 

@@ -17,18 +17,19 @@ import com.cylonid.nativealpha.model.WebApp
 import com.cylonid.nativealpha.util.Const
 import com.cylonid.nativealpha.util.WebViewLauncher.startWebView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
-import java.util.ArrayList
 
-class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activityOfFragment: Activity)
-    : DragDropSwipeAdapter<WebApp, WebAppListAdapter.ViewHolder>(dataSet) {
+class WebAppListAdapter(
+    dataSet: List<WebApp> = emptyList(),
+    private val activityOfFragment: Activity
+) : DragDropSwipeAdapter<WebApp, WebAppListAdapter.ViewHolder>(dataSet) {
 
     class ViewHolder(webAppLayout: View) : DragDropSwipeAdapter.ViewHolder(webAppLayout) {
 
         val titleView: TextView = itemView.findViewById(R.id.btn_title)
-        val openButton : ImageButton = itemView.findViewById(R.id.btnOpenWebview)
-        val settingsButton : ImageButton = itemView.findViewById(R.id.btnSettings)
-        val deleteButton : ImageButton = itemView.findViewById(R.id.btnDelete)
-        val dragAnchor : ImageView = itemView.findViewById(R.id.dragAnchor)
+        val openButton: ImageButton = itemView.findViewById(R.id.btnOpenWebview)
+        val settingsButton: ImageButton = itemView.findViewById(R.id.btnSettings)
+        val deleteButton: ImageButton = itemView.findViewById(R.id.btnDelete)
+        val dragAnchor: ImageView = itemView.findViewById(R.id.dragAnchor)
     }
 
     override fun getViewHolder(itemView: View) = ViewHolder(itemView)
@@ -46,7 +47,7 @@ class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activit
                 WebAppSettingsActivity::class.java
             )
             intent.putExtra(Const.INTENT_WEBAPPID, item.ID)
-            intent.setAction(Intent.ACTION_VIEW)
+            intent.action = Intent.ACTION_VIEW
             startActivity(activityOfFragment, intent, null)
         }
 
@@ -66,7 +67,7 @@ class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activit
     private fun buildDeleteItemDialog(ID: Int) {
         val builder = AlertDialog.Builder(activityOfFragment)
         builder.setMessage(getString(R.string.delete_question))
-        builder.setPositiveButton(getString(android.R.string.yes)) { _: DialogInterface?, _: Int ->
+        builder.setPositiveButton(getString(android.R.string.ok)) { _: DialogInterface?, _: Int ->
             val webapp = DataManager.getInstance().getWebApp(ID)
             if (webapp != null) {
                 webapp.markInactive()
@@ -74,7 +75,8 @@ class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activit
             }
             updateWebAppList()
         }
-        builder.setNegativeButton(getString(android.R.string.no)
+        builder.setNegativeButton(
+            getString(android.R.string.cancel)
         ) { dialog: DialogInterface, _: Int -> dialog.cancel() }
         val dialog = builder.create()
         dialog.show()
@@ -86,10 +88,14 @@ class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activit
 
 
     private fun getString(@StringRes resId: Int): String {
-      return activityOfFragment.getString(resId)
+        return activityOfFragment.getString(resId)
 
     }
 
-    override fun getViewToTouchToStartDraggingItem(item: WebApp, viewHolder: ViewHolder, position: Int) = viewHolder.dragAnchor
+    override fun getViewToTouchToStartDraggingItem(
+        item: WebApp,
+        viewHolder: ViewHolder,
+        position: Int
+    ) = viewHolder.dragAnchor
 
 }

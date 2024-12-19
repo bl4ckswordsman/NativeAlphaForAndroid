@@ -95,28 +95,28 @@ class MainActivity : EdgeToEdgeActivity() {
                 DataManager.getInstance().activeWebsitesCount
             )
         )
-        builder.setPositiveButton(getString(android.R.string.yes)) { _: DialogInterface?, _: Int ->
+        builder.setPositiveButton(getString(android.R.string.ok)) { _: DialogInterface?, _: Int ->
             val webapps = DataManager.getInstance().activeWebsites
             for (i in webapps.indices.reversed()) {
                 val webapp = webapps[i]
-                val last_webapp = i == webapps.size - 1
+                i == webapps.size - 1
                 val msg = Html.fromHtml(
                     getString(R.string.restore_shortcut, webapp.title),
                     Html.FROM_HTML_MODE_COMPACT
                 )
                 val addition_dialog = AlertDialog.Builder(this)
                     .setMessage(msg)
-                    .setPositiveButton(android.R.string.yes) { _: DialogInterface?, _: Int ->
+                    .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                         val frag = ShortcutDialogFragment.newInstance(webapp)
                         frag.show(supportFragmentManager, "SCFetcher-" + webapp.ID)
                     }
-                    .setNegativeButton(android.R.string.no) { _: DialogInterface?, _: Int -> }
+                    .setNegativeButton(android.R.string.cancel) { _: DialogInterface?, _: Int -> }
                     .create()
 
                 addition_dialog.show()
             }
         }
-        builder.setNegativeButton(getString(android.R.string.no)) { _: DialogInterface?, _: Int -> }
+        builder.setNegativeButton(getString(android.R.string.cancel)) { _: DialogInterface?, _: Int -> }
         builder.create().show()
     }
 
@@ -178,7 +178,11 @@ class MainActivity : EdgeToEdgeActivity() {
                     if (!(str_url.startsWith("https://")) && !(str_url.startsWith("http://"))) {
                         str_url = "https://$str_url"
                     }
-                    val newSite = WebApp(str_url, DataManager.getInstance().incrementedID, DataManager.getInstance().incrementedOrder)
+                    val newSite = WebApp(
+                        str_url,
+                        DataManager.getInstance().incrementedID,
+                        DataManager.getInstance().incrementedOrder
+                    )
                     newSite.applySettingsForNewWebApp()
                     DataManager.getInstance().addWebsite(newSite)
 

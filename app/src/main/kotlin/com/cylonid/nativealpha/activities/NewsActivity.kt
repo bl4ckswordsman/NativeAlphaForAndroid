@@ -1,10 +1,9 @@
-package com.cylonid.nativealpha.activities;
+package com.cylonid.nativealpha.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -13,7 +12,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
-import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.cylonid.nativealpha.BuildConfig
@@ -22,10 +20,10 @@ import com.cylonid.nativealpha.databinding.NewsActivityBinding
 import com.cylonid.nativealpha.model.DataManager
 import com.cylonid.nativealpha.util.LocaleUtils
 import com.cylonid.nativealpha.util.Utility
-import kotlin.properties.Delegates
 
 
-class NewsActivity : AppCompatActivity(), View.OnTouchListener, ViewTreeObserver.OnScrollChangedListener {
+class NewsActivity : AppCompatActivity(), View.OnTouchListener,
+    ViewTreeObserver.OnScrollChangedListener {
 
     private var btnDefaultBackgroundColor: Drawable? = null
     private var btnDefaultTextColor: Int = android.R.color.black
@@ -69,7 +67,7 @@ class NewsActivity : AppCompatActivity(), View.OnTouchListener, ViewTreeObserver
                 this,
                 getString(R.string.scroll_to_bottom),
                 Toast.LENGTH_SHORT
-            ) 
+            )
         }
     }
 
@@ -96,7 +94,10 @@ class NewsActivity : AppCompatActivity(), View.OnTouchListener, ViewTreeObserver
                 val height: Int = binding.newsScrollchild.measuredHeight
                 if (height > 0) {
                     binding.newsScrollchild.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    if (binding.newsScrollchild.canScrollVertically(1) || binding.newsScrollview.canScrollVertically(-1)) {
+                    if (binding.newsScrollchild.canScrollVertically(1) || binding.newsScrollview.canScrollVertically(
+                            -1
+                        )
+                    ) {
                         binding.newsScrollview.setOnTouchListener(this@NewsActivity)
                         binding.newsScrollview.viewTreeObserver.addOnScrollChangedListener(this@NewsActivity)
                         disableAcceptButton()
@@ -109,8 +110,8 @@ class NewsActivity : AppCompatActivity(), View.OnTouchListener, ViewTreeObserver
     private fun setText() {
         val fileId = intent.extras?.getString("text") ?: "latestUpdate"
 
-        binding.newsContent.loadUrl("file:///android_asset/news/" + fileId + "_" + LocaleUtils.fileEnding +".html")
-        if(DataManager.getInstance().eulaData) {
+        binding.newsContent.loadUrl("file:///android_asset/news/" + fileId + "_" + LocaleUtils.fileEnding + ".html")
+        if (DataManager.getInstance().eulaData) {
             binding.btnNewsConfirm.isEnabled = true
             binding.newsContent.settings.javaScriptEnabled = true
             binding.newsContent.webViewClient = NewsWebViewClient()
@@ -129,10 +130,11 @@ class NewsActivity : AppCompatActivity(), View.OnTouchListener, ViewTreeObserver
 
     override fun onScrollChanged() {
         val view = binding.newsScrollview.getChildAt(binding.newsScrollview.childCount - 1)
-        val bottomDetector: Int = view.bottom - (binding.newsScrollview.height + binding.newsScrollview.scrollY)
+        val bottomDetector: Int =
+            view.bottom - (binding.newsScrollview.height + binding.newsScrollview.scrollY)
 
         if (bottomDetector < 30) {
-           enableAcceptButton()
+            enableAcceptButton()
         }
     }
 }

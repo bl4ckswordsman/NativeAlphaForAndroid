@@ -1,7 +1,6 @@
 package com.cylonid.nativealpha
 
 import android.os.Bundle
-import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -24,28 +23,31 @@ abstract class EdgeToEdgeActivity : AppCompatActivity() {
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
             // Handle AppBarLayout if present
-            findViewById<AppBarLayout?>(com.cylonid.nativealpha.R.id.appBarLayout)?.let { appBar ->
+            findViewById<AppBarLayout?>(R.id.appBarLayout)?.let { appBar ->
                 appBar.updatePadding(top = systemBars.top)
 
                 // Handle Toolbar if present
-                findViewById<Toolbar?>(com.cylonid.nativealpha.R.id.toolbar)?.apply {
+                findViewById<Toolbar?>(R.id.toolbar)?.apply {
                     layoutParams = (layoutParams as AppBarLayout.LayoutParams).apply {
-                        height = theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
-                            .use { it.getDimensionPixelSize(0, 0) }
+                        height =
+                            theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
+                                .use { it.getDimensionPixelSize(0, 0) }
                     }
                 }
             }
 
             // Handle FAB if present
-            findViewById<FloatingActionButton?>(com.cylonid.nativealpha.R.id.fab)?.let { fab ->
+            findViewById<FloatingActionButton?>(R.id.fab)?.let { fab ->
                 fab.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    bottomMargin = systemBars.bottom + resources.getDimensionPixelSize(com.cylonid.nativealpha.R.dimen.fab_margin)
-                    rightMargin = systemBars.right + resources.getDimensionPixelSize(com.cylonid.nativealpha.R.dimen.fab_margin)
+                    bottomMargin =
+                        systemBars.bottom + resources.getDimensionPixelSize(R.dimen.fab_margin)
+                    rightMargin =
+                        systemBars.right + resources.getDimensionPixelSize(R.dimen.fab_margin)
                 }
             }
 
             // Handle standard content padding if no specific handlers above
-            if (findViewById<AppBarLayout?>(com.cylonid.nativealpha.R.id.appBarLayout) == null) {
+            if (findViewById<AppBarLayout?>(R.id.appBarLayout) == null) {
                 view.updatePadding(
                     left = systemBars.left,
                     top = systemBars.top,

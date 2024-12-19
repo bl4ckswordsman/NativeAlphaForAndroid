@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="settings"
             type="com.cylonid.nativealpha.model.GlobalSettings" />
     </data>
 
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/layoutSettingsActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -50,7 +51,6 @@
                     <Space
                         android:layout_width="1dp"
                         android:layout_height="30dp" />
-
 
 
                     <LinearLayout
@@ -105,42 +105,42 @@
 
                         </LinearLayout>
 
-                        <Switch
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/switchGlobalCache"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="@={settings.clearCache}"
                             android:text="@string/clear_cache_after_usage" />
 
-                        <Switch
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/switchGlobalMultiTouchReload"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="@={settings.multitouchReload}"
                             android:text="@string/global_settings_multitouch_reload" />
 
-                        <Switch
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/switchGlobalMultiTouch"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="@={settings.twoFingerMultitouch}"
                             android:text="@string/use_two_finger_swipes_for_browser_forward_and_backward_navigation" />
 
-                        <Switch
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/switchGlobalMultiTouch3Fingers"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="@={settings.threeFingerMultitouch}"
                             android:text="@string/use_three_finger_swipes_to_switch_between_web_apps_experimental" />
 
-                        <Switch
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/switchShowProgressbar"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="@={settings.showProgressbar}"
                             android:text="@string/show_progress_bar_during_page_load" />
 
-                        <Switch
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/switchAlwaysShowSoftwareButtons"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

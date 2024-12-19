@@ -1,5 +1,14 @@
 package com.cylonid.nativealpha;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.any;
+
 import android.view.View;
 
 import androidx.annotation.CheckResult;
@@ -25,30 +34,22 @@ import org.junit.Assert;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.any;
-
 public class TestUtils {
 
 
     public static void acceptLicense() {
         onView(withId(R.id.btnNewsConfirm)).perform(click());
     }
+
     public static void alertDialogAccept() {
         onView(withId(android.R.id.button1)).perform(click());
     }
+
     public static void alertDialogDismiss() {
         onView(withId(android.R.id.button2)).perform(click());
     }
 
-    public static boolean viewIsDisplayed(int viewId)
-    {
+    public static boolean viewIsDisplayed(int viewId) {
         final boolean[] isDisplayed = {true};
         onView(withId(viewId)).withFailureHandler((error, viewMatcher) -> isDisplayed[0] = false).check(matches(isDisplayed()));
         return isDisplayed[0];
@@ -104,10 +105,11 @@ public class TestUtils {
     public static Matcher<View> getElementFromMatchAtPosition(final Matcher<View> matcher, final int position) {
         return new BaseMatcher<View>() {
             int counter = 0;
+
             @Override
             public boolean matches(final Object item) {
                 if (matcher.matches(item)) {
-                    if(counter == position) {
+                    if (counter == position) {
                         counter++;
                         return true;
                     }
@@ -141,6 +143,7 @@ public class TestUtils {
         onView(isRoot()).check((view, noViewFoundException) -> activity[0] = (AppCompatActivity) view.getContext());
         return activity[0];
     }
+
     private static class MatcherExtension {
         @CheckResult
         public static boolean exists(ViewInteraction interaction) {

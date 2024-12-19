@@ -8,17 +8,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.WebStorage;
-import android.webkit.WebView;
 import android.widget.Button;
+
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+
 import com.cylonid.nativealpha.databinding.GlobalSettingsBinding;
 import com.cylonid.nativealpha.model.DataManager;
 import com.cylonid.nativealpha.model.GlobalSettings;
 import com.cylonid.nativealpha.util.Const;
 import com.cylonid.nativealpha.util.Utility;
 import com.google.android.material.snackbar.Snackbar;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -27,9 +28,9 @@ public class SettingsActivity extends EdgeToEdgeActivity {
 
     @Override
     protected void onActivityResult(
-        int requestCode,
-        int resultCode,
-        Intent data
+            int requestCode,
+            int resultCode,
+            Intent data
     ) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CODE_WRITE_FILE && resultCode == RESULT_OK) {
@@ -39,15 +40,15 @@ public class SettingsActivity extends EdgeToEdgeActivity {
 
             if (!DataManager.getInstance().saveSharedPreferencesToFile(uri)) {
                 Utility.showInfoSnackbar(
-                    this,
-                    getString(R.string.export_failed),
-                    Snackbar.LENGTH_LONG
+                        this,
+                        getString(R.string.export_failed),
+                        Snackbar.LENGTH_LONG
                 );
             } else {
                 Utility.showInfoSnackbar(
-                    this,
-                    getString(R.string.export_success),
-                    Snackbar.LENGTH_SHORT
+                        this,
+                        getString(R.string.export_success),
+                        Snackbar.LENGTH_SHORT
                 );
             }
         }
@@ -56,14 +57,14 @@ public class SettingsActivity extends EdgeToEdgeActivity {
 
             if (!DataManager.getInstance().loadSharedPreferencesFromFile(uri)) {
                 Utility.showInfoSnackbar(
-                    this,
-                    getString(R.string.import_failed),
-                    Snackbar.LENGTH_LONG
+                        this,
+                        getString(R.string.import_failed),
+                        Snackbar.LENGTH_LONG
                 );
             } else {
                 Intent i = new Intent(
-                    SettingsActivity.this,
-                    MainActivity.class
+                        SettingsActivity.this,
+                        MainActivity.class
                 );
 
                 WebStorage.getInstance().deleteAllData();
@@ -82,8 +83,8 @@ public class SettingsActivity extends EdgeToEdgeActivity {
         super.onCreate(savedInstanceState);
 
         GlobalSettingsBinding binding = DataBindingUtil.setContentView(
-            this,
-            R.layout.global_settings
+                this,
+                R.layout.global_settings
         );
         GlobalSettings settings = DataManager.getInstance().getSettings();
         final GlobalSettings modified_settings = new GlobalSettings(settings);
@@ -97,12 +98,12 @@ public class SettingsActivity extends EdgeToEdgeActivity {
 
         btnGlobalWebApp.setOnClickListener(v -> {
             Intent intent = new Intent(
-                SettingsActivity.this,
-                WebAppSettingsActivity.class
+                    SettingsActivity.this,
+                    WebAppSettingsActivity.class
             );
             intent.putExtra(
-                Const.INTENT_WEBAPPID,
-                settings.getGlobalWebApp().getID()
+                    Const.INTENT_WEBAPPID,
+                    settings.getGlobalWebApp().getID()
             );
             intent.setAction(Intent.ACTION_VIEW);
             startActivity(intent);
@@ -110,24 +111,24 @@ public class SettingsActivity extends EdgeToEdgeActivity {
 
         btnExport.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("*/*");
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .setType("*/*");
             SimpleDateFormat sdf = new SimpleDateFormat(
-                "yyyyMMdd_HHmmss",
-                Locale.getDefault()
+                    "yyyyMMdd_HHmmss",
+                    Locale.getDefault()
             );
             String currentDateTime = sdf.format(new Date());
             intent.putExtra(
-                Intent.EXTRA_TITLE,
-                "NativeAlpha_" + currentDateTime
+                    Intent.EXTRA_TITLE,
+                    "NativeAlpha_" + currentDateTime
             );
             try {
                 startActivityForResult(intent, CODE_WRITE_FILE);
             } catch (android.content.ActivityNotFoundException e) {
                 Utility.showInfoSnackbar(
-                    SettingsActivity.this,
-                    getString(R.string.no_filemanager),
-                    Snackbar.LENGTH_LONG
+                        SettingsActivity.this,
+                        getString(R.string.no_filemanager),
+                        Snackbar.LENGTH_LONG
                 );
                 e.printStackTrace();
             }
@@ -135,18 +136,18 @@ public class SettingsActivity extends EdgeToEdgeActivity {
 
         btnImport.setOnClickListener(v -> {
             Intent intent = new Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT);
+                    .setType("*/*")
+                    .setAction(Intent.ACTION_GET_CONTENT);
             try {
                 startActivityForResult(
-                    Intent.createChooser(intent, "Select a file"),
-                    CODE_OPEN_FILE
+                        Intent.createChooser(intent, "Select a file"),
+                        CODE_OPEN_FILE
                 );
             } catch (android.content.ActivityNotFoundException e) {
                 Utility.showInfoSnackbar(
-                    SettingsActivity.this,
-                    getString(R.string.no_filemanager),
-                    Snackbar.LENGTH_LONG
+                        SettingsActivity.this,
+                        getString(R.string.no_filemanager),
+                        Snackbar.LENGTH_LONG
                 );
                 e.printStackTrace();
             }

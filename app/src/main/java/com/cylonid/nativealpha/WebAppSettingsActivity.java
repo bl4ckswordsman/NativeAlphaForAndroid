@@ -13,14 +13,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.databinding.DataBindingUtil;
+
 import com.cylonid.nativealpha.databinding.WebappSettingsBinding;
 import com.cylonid.nativealpha.model.DataManager;
 import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.App;
 import com.cylonid.nativealpha.util.Const;
 import com.cylonid.nativealpha.util.Utility;
+
 import java.util.Calendar;
 
 public class WebAppSettingsActivity extends EdgeToEdgeActivity {
@@ -29,29 +31,29 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
     WebApp webapp;
     boolean isGlobalWebApp;
 
-    @SuppressLint({ "SetJavaScriptEnabled", "ClickableViewAccessibility" })
+    @SuppressLint({"SetJavaScriptEnabled", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         WebappSettingsBinding binding = DataBindingUtil.setContentView(
-            this,
-            R.layout.webapp_settings
+                this,
+                R.layout.webapp_settings
         );
         TextView txt = findViewById(R.id.txthintUserAgent);
         txt.setText(
-            Html.fromHtml(
-                getString(R.string.hint_user_agent),
-                Html.FROM_HTML_MODE_LEGACY
-            )
+                Html.fromHtml(
+                        getString(R.string.hint_user_agent),
+                        Html.FROM_HTML_MODE_LEGACY
+                )
         );
         txt.setMovementMethod(LinkMovementMethod.getInstance());
 
         webappID = getIntent().getIntExtra(Const.INTENT_WEBAPPID, -1);
         Utility.Assert(webappID != -1, "WebApp ID could not be retrieved.");
         isGlobalWebApp =
-            webappID ==
-            DataManager.getInstance().getSettings().getGlobalWebApp().getID();
+                webappID ==
+                        DataManager.getInstance().getSettings().getGlobalWebApp().getID();
 
         final View inflated_view = binding.getRoot();
 
@@ -59,7 +61,7 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
             webapp = DataManager.getInstance().getSettings().getGlobalWebApp();
             prepareGlobalWebAppScreen();
         } else webapp = DataManager.getInstance()
-            .getWebAppIgnoringGlobalOverride(webappID, true);
+                .getWebAppIgnoringGlobalOverride(webappID, true);
 
         if (webapp == null) {
             finish();
@@ -69,15 +71,15 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
             binding.setActivity(WebAppSettingsActivity.this);
 
             final Button btnCreateShortcut = inflated_view.findViewById(
-                R.id.btnRecreateShortcut
+                    R.id.btnRecreateShortcut
             );
 
             btnCreateShortcut.setOnClickListener(view -> {
                 ShortcutDialogFragment frag =
-                    ShortcutDialogFragment.newInstance(webapp);
+                        ShortcutDialogFragment.newInstance(webapp);
                 frag.show(
-                    getSupportFragmentManager(),
-                    "SCFetcher-" + webapp.getID()
+                        getSupportFragmentManager(),
+                        "SCFetcher-" + webapp.getID()
                 );
             });
             Button btnSave = findViewById(R.id.btnSave);
@@ -85,15 +87,15 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
 
             btnSave.setOnClickListener(v -> {
                 ActivityManager activityManager =
-                    (ActivityManager) App.getAppContext()
-                        .getSystemService(Context.ACTIVITY_SERVICE);
+                        (ActivityManager) App.getAppContext()
+                                .getSystemService(Context.ACTIVITY_SERVICE);
 
                 //Global web app => close all webview activities, save to global settings
                 if (isGlobalWebApp) {
                     for (ActivityManager.AppTask task : activityManager.getAppTasks()) {
                         int id = task
-                            .getTaskInfo()
-                            .baseIntent.getIntExtra(Const.INTENT_WEBAPPID, -1);
+                                .getTaskInfo()
+                                .baseIntent.getIntExtra(Const.INTENT_WEBAPPID, -1);
                         if (id != -1) task.finishAndRemoveTask();
                     }
                     for (ActivityManager.RunningAppProcessInfo processInfo : activityManager.getRunningAppProcesses()) {
@@ -102,24 +104,24 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
                         }
                     }
                     DataManager.getInstance()
-                        .getSettings()
-                        .setGlobalWebApp(modified_webapp);
+                            .getSettings()
+                            .setGlobalWebApp(modified_webapp);
                     DataManager.getInstance().saveGlobalSettings();
                 }
                 //Normal web app => only close that specific web app, save to webapp arraylist
                 else {
                     for (ActivityManager.AppTask task : activityManager.getAppTasks()) {
                         int id = task
-                            .getTaskInfo()
-                            .baseIntent.getIntExtra(Const.INTENT_WEBAPPID, -1);
+                                .getTaskInfo()
+                                .baseIntent.getIntExtra(Const.INTENT_WEBAPPID, -1);
                         if (id == webappID) task.finishAndRemoveTask();
                     }
                     for (ActivityManager.RunningAppProcessInfo processInfo : activityManager.getRunningAppProcesses()) {
                         if (
-                            processInfo.processName.contains(
-                                "web_sandbox_" +
-                                modified_webapp.getContainerId()
-                            )
+                                processInfo.processName.contains(
+                                        "web_sandbox_" +
+                                                modified_webapp.getContainerId()
+                                )
                         ) {
                             android.os.Process.killProcess(processInfo.pid);
                         }
@@ -128,8 +130,8 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
                 }
 
                 Intent i = new Intent(
-                    WebAppSettingsActivity.this,
-                    MainActivity.class
+                        WebAppSettingsActivity.this,
+                        MainActivity.class
                 );
                 i.putExtra(Const.INTENT_WEBAPP_CHANGED, true);
                 finish();
@@ -138,26 +140,26 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
 
             btnCancel.setOnClickListener(v -> finish());
             EditText txtBeginDarkMode = inflated_view.findViewById(
-                R.id.textDarkModeBegin
+                    R.id.textDarkModeBegin
             );
             EditText txtEndDarkMode = inflated_view.findViewById(
-                R.id.textDarkModeEnd
+                    R.id.textDarkModeEnd
             );
 
             txtBeginDarkMode.setOnClickListener(view ->
-                showTimePicker(txtBeginDarkMode)
+                    showTimePicker(txtBeginDarkMode)
             );
             txtEndDarkMode.setOnClickListener(view ->
-                showTimePicker(txtEndDarkMode)
+                    showTimePicker(txtEndDarkMode)
             );
 
             webapp.onSwitchExpertSettingsChanged(
-                inflated_view.findViewById(R.id.switchExpertSettings),
-                webapp.isShowExpertSettings()
+                    inflated_view.findViewById(R.id.switchExpertSettings),
+                    webapp.isShowExpertSettings()
             );
             webapp.onSwitchOverrideGlobalSettingsChanged(
-                findViewById(R.id.switchOverrideGlobal),
-                webapp.isOverrideGlobalSettings()
+                    findViewById(R.id.switchOverrideGlobal),
+                    webapp.isOverrideGlobalSettings()
             );
             setPlusSettings(inflated_view);
         }
@@ -167,7 +169,7 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
         LinearLayout secDarkMode = v.findViewById(R.id.sectionDarkmode);
         LinearLayout secKiosk = v.findViewById(R.id.sectionKioskMode);
         LinearLayout secAccessRestriction = v.findViewById(
-            R.id.sectionAccessRestriction
+                R.id.sectionAccessRestriction
         );
         if (!BuildConfig.FLAVOR.equals("extended")) {
             secDarkMode.setVisibility(View.GONE);
@@ -178,22 +180,22 @@ public class WebAppSettingsActivity extends EdgeToEdgeActivity {
 
     private void showTimePicker(EditText txtField) {
         Calendar c = Utility.convertStringToCalendar(
-            txtField.getText().toString()
+                txtField.getText().toString()
         );
         TimePickerDialog timePickerDialog = new TimePickerDialog(
-            WebAppSettingsActivity.this,
-            R.style.CustomDatePickerDialog,
-            (timePicker, selectedHour, selectedMinute) -> {
-                Calendar datetime = Calendar.getInstance();
-                datetime.set(Calendar.HOUR_OF_DAY, selectedHour);
-                datetime.set(Calendar.MINUTE, selectedMinute);
-                txtField.setText(
-                    Utility.getHourMinFormat().format(datetime.getTime())
-                );
-            },
-            c.get(Calendar.HOUR_OF_DAY),
-            c.get(Calendar.MINUTE),
-            true
+                WebAppSettingsActivity.this,
+                R.style.CustomDatePickerDialog,
+                (timePicker, selectedHour, selectedMinute) -> {
+                    Calendar datetime = Calendar.getInstance();
+                    datetime.set(Calendar.HOUR_OF_DAY, selectedHour);
+                    datetime.set(Calendar.MINUTE, selectedMinute);
+                    txtField.setText(
+                            Utility.getHourMinFormat().format(datetime.getTime())
+                    );
+                },
+                c.get(Calendar.HOUR_OF_DAY),
+                c.get(Calendar.MINUTE),
+                true
         );
         timePickerDialog.show();
     }

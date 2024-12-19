@@ -4,11 +4,9 @@ import com.google.gson.InstanceCreator;
 
 import java.lang.reflect.Type;
 
-public class GlobalSettingsInstanceCreator implements InstanceCreator<GlobalSettings>
-{
+public class GlobalSettingsInstanceCreator implements InstanceCreator<GlobalSettings> {
     @Override
-    public GlobalSettings createInstance(Type type)
-    {
+    public GlobalSettings createInstance(Type type) {
         return new GlobalSettings();
     }
 }

@@ -141,7 +141,8 @@ class WebApp {
 
 
     val alphanumericBaseUrl: String
-        get() = baseUrl.replace("\\P{Alnum}".toRegex(), "").replace("https", "").replace("http", "").replace("www", "")
+        get() = baseUrl.replace("\\P{Alnum}".toRegex(), "").replace("https", "").replace("http", "")
+            .replace("www", "")
 
     fun onSwitchCookiesChanged(mSwitch: CompoundButton, isChecked: Boolean) {
         val switchThirdPCookies = mSwitch.rootView.findViewById<Switch>(R.id.switch3PCookies)
@@ -155,8 +156,10 @@ class WebApp {
         switchBiometricAccess.setOnCheckedChangeListener(null)
     }
 
-    private fun enableSwitchBiometricAccessChangeListener(switchBiometricAccess: Switch,
-                                                          activity: WebAppSettingsActivity) {
+    private fun enableSwitchBiometricAccessChangeListener(
+        switchBiometricAccess: Switch,
+        activity: WebAppSettingsActivity
+    ) {
         switchBiometricAccess.setOnCheckedChangeListener { switch, checked ->
             onSwitchBiometricAccessChanged(
                 switch,
@@ -166,9 +169,11 @@ class WebApp {
         }
     }
 
-    private fun setSwitchBiometricAccessSilently(newValue: Boolean,
-                                                 switchBiometricAccess: Switch,
-                                                 activity: WebAppSettingsActivity) {
+    private fun setSwitchBiometricAccessSilently(
+        newValue: Boolean,
+        switchBiometricAccess: Switch,
+        activity: WebAppSettingsActivity
+    ) {
         disableSwitchBiometricAccessChangeListener(switchBiometricAccess)
         switchBiometricAccess.isChecked = newValue
         enableSwitchBiometricAccessChangeListener(switchBiometricAccess, activity)
@@ -183,7 +188,11 @@ class WebApp {
             mSwitch.rootView.findViewById<Switch>(R.id.switchBiometricAccess)
 
         // reset to value before user toggled, actual setting of value is done by prompt success callback
-        setSwitchBiometricAccessSilently(!switchBiometricAccess.isChecked, switchBiometricAccess, activity)
+        setSwitchBiometricAccessSilently(
+            !switchBiometricAccess.isChecked,
+            switchBiometricAccess,
+            activity
+        )
 
         if (!switchBiometricAccess.isChecked) {
             BiometricPromptHelper(activity as FragmentActivity).showPrompt(
@@ -273,11 +282,13 @@ class WebApp {
 
     fun onSwitchExpertSettingsChanged(mSwitch: CompoundButton, isChecked: Boolean) {
         val expertSettings = mSwitch.rootView.findViewById<LinearLayout>(R.id.sectionExpertSettings)
-        if (isChecked) expertSettings.visibility = View.VISIBLE else expertSettings.visibility = View.GONE
+        if (isChecked) expertSettings.visibility = View.VISIBLE else expertSettings.visibility =
+            View.GONE
     }
 
     fun onSwitchOverrideGlobalSettingsChanged(mSwitch: CompoundButton, isChecked: Boolean) {
-        val sectionDetailedWebAppSettings = mSwitch.rootView.findViewById<LinearLayout>(R.id.sectionWebAppDetailSettings)
+        val sectionDetailedWebAppSettings =
+            mSwitch.rootView.findViewById<LinearLayout>(R.id.sectionWebAppDetailSettings)
         Utility.setViewAndChildrenEnabled(sectionDetailedWebAppSettings, isChecked)
     }
 }

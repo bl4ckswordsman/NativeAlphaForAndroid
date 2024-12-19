@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="webapp"
             type="com.cylonid.nativealpha.model.WebApp" />
 
         <variable
             name="activity"
-            type="com.cylonid.nativealpha.WebAppSettingsActivity"/>
+            type="com.cylonid.nativealpha.WebAppSettingsActivity" />
     </data>
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="false"
@@ -83,7 +83,7 @@
                         android:inputType="text"
                         android:text="@={webapp.title}" />
 
-                    <Switch
+                    <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/switchOverrideGlobal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchJavascript"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -125,48 +125,49 @@
                                 android:onCheckedChanged="@{(switch, checked) -> webapp.onSwitchJsChanged(switch, checked)}"
                                 android:text="@string/allow_javascript" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchBlockThirdParty"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.blockThirdPartyRequests}"
                                 android:text="@string/block_all_third_party_requests" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchHTTP"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.allowHttp}"
                                 android:text="@string/allow_http" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchLocationAccess"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.allowLocationAccess}"
                                 android:text="@string/allow_location_access" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchDRMContent"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.drmAllowed}"
                                 android:text="@string/allow_drm_content" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchCameraAccess"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.cameraPermission}"
                                 android:text="@string/allow_camera_access" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchMicrophoneAccess"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.microphonePermission}"
                                 android:text="@string/allow_microphone_access" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/sectionAccessRestriction"
                             android:layout_width="match_parent"
@@ -183,7 +184,8 @@
                                 android:text="@string/webapp_section_access_restriction"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
-                            <Switch
+
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchBiometricAccess"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -211,7 +213,7 @@
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchCookies"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -219,7 +221,7 @@
                                 android:onCheckedChanged="@{(switch, checked) -> webapp.onSwitchCookiesChanged(switch, checked)}"
                                 android:text="@string/accept_cookies" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switch3PCookies"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -227,7 +229,7 @@
                                 android:enabled="@{webapp.allowCookies}"
                                 android:text="@string/accept_third_party_cookies" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchAdblock"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -253,7 +255,7 @@
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchDarkMode"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -261,7 +263,7 @@
                                 android:onCheckedChanged="@{(switch, checked) -> webapp.onSwitchForceDarkChanged(switch, checked)}"
                                 android:text="@string/force_dark_mode" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchTimeSpanDarkMode"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -352,7 +354,7 @@
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchSaveDataRequest"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -360,7 +362,7 @@
                                 android:enabled="true"
                                 android:text="@string/request_data_saving_page" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchBlockImages"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -385,7 +387,7 @@
                                 android:text="@string/webapp_autoreload"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchAutoreload"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -418,6 +420,7 @@
 
                             </LinearLayout>
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/sectionKioskMode"
                             android:layout_width="match_parent"
@@ -435,14 +438,14 @@
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchFullScreen"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.showFullscreen}"
                                 android:text="@string/show_fullscreen" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchKeepAwake"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -468,7 +471,7 @@
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchDesktopSite"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -476,33 +479,33 @@
                                 android:enabled="@{webapp.allowJs}"
                                 android:text="@string/request_website_in_desktop_version" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchOpenUrlExternal"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.openUrlExternal}"
                                 android:text="@string/open_external_links_in_browser_app" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchEnableZoom"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.enableZooming}"
                                 android:text="@string/activate_two_finger_zoom" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchFallbackToStandardContextmenu"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={webapp.alwaysUseFallbackContextMenu}"
                                 android:text="@string/use_standard_context_menu_permanently" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchMediaplaybackBackground"
                                 android:visibility="gone"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                                                android:checked="@={webapp.allowMediaPlaybackInBackground}"
+                                android:checked="@={webapp.allowMediaPlaybackInBackground}"
                                 android:text="@string/allow_media_playback_in_background" />
 
 
@@ -515,7 +518,7 @@
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textStyle="bold" />
 
-                        <Switch
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/switchExpertSettings"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -533,6 +536,7 @@
                             android:orientation="vertical"
                             android:showDividers="middle"
                             android:visibility="gone">
+
                             <TextView
                                 android:id="@+id/labelEditableBaseUrl"
                                 android:layout_width="match_parent"
@@ -541,6 +545,7 @@
                                 android:text="@string/start_url"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
+
                             <EditText
                                 android:id="@+id/textBaseUrl"
                                 android:layout_width="match_parent"
@@ -558,7 +563,7 @@
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                 android:textStyle="bold" />
 
-                            <Switch
+                            <androidx.appcompat.widget.SwitchCompat
                                 android:id="@+id/switchUserAgent"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -622,7 +627,7 @@
                                         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
                                 </LinearLayout>
 
-                                <Switch
+                                <androidx.appcompat.widget.SwitchCompat
                                     android:id="@+id/switchIgnoreSSLErrors"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"

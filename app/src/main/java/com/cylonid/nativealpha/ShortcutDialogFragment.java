@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +48,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -418,11 +420,25 @@ public class ShortcutDialogFragment extends DialogFragment {
             ShortcutManager scManager = App.getAppContext().getSystemService(ShortcutManager.class);
             if (!scManager.getPinnedShortcuts().stream().anyMatch(s -> s.getId().equals(newScId))) {
                 ShortcutManagerCompat.requestPinShortcut(requireActivity(), pinShortcutInfo, null);
+                saveCustomIconToSharedPreferences(final_title, bitmap);
             } else {
                 Utility.showToast(requireActivity(), getString(R.string.shortcut_already_exists));
             }
         }
 
+    }
+
+    private void saveCustomIconToSharedPreferences(String shortcutTitle, Bitmap bitmap) {
+        if (bitmap != null) {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            String encodedBitmap = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+
+            requireActivity().getSharedPreferences("custom_icons", AppCompatActivity.MODE_PRIVATE)
+                    .edit()
+                    .putString(shortcutTitle, encodedBitmap)
+                    .apply();
+        }
     }
 
     private void prepareFailedUI() {

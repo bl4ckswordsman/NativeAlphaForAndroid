@@ -11,6 +11,7 @@ import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import android.os.Handler;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -118,6 +120,20 @@ public class WebViewActivity
                 );
             }
             setupWebView();
+        }
+
+        // Retrieve the custom icon from shared preferences and set it as the app icon
+        String shortcutTitle = webapp.getTitle();
+        String encodedBitmap = getSharedPreferences("custom_icons", MODE_PRIVATE)
+                .getString(shortcutTitle, null);
+
+        if (encodedBitmap != null) {
+            byte[] decodedBytes = Base64.decode(encodedBitmap, Base64.DEFAULT);
+            Bitmap customIcon = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+            if (customIcon != null) {
+                setTaskDescription(new ActivityManager.TaskDescription(shortcutTitle, customIcon));
+            }
         }
     }
 

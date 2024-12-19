@@ -163,4 +163,5 @@
     <string name="always_show_software_buttons">Always show software navigation buttons</string>
     <string name="use_standard_context_menu_temporarily">Temporarily use standard context menu</string>
     <string name="use_standard_context_menu_permanently">Use standard context menu</string>
+    <string name="enable_password_autofill">Enable password auto-fill</string>
 </resources>

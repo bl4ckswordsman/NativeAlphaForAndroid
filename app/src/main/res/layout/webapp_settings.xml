@@ -234,6 +234,13 @@
                                 android:checked="@={webapp.useAdblock}"
                                 android:enabled="@{webapp.allowJs}"
                                 android:text="@string/enable_adblock_experimental" />
+                                
+                            <Switch
+                                android:id="@+id/switchPasswordAutofill"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:checked="@={webapp.passwordAutofill}"
+                                android:text="@string/enable_password_autofill" />
                         </LinearLayout>
 
                         <LinearLayout

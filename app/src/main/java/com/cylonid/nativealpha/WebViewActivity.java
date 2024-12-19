@@ -58,6 +58,7 @@ import com.cylonid.nativealpha.model.DataManager;
 import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.Const;
 import com.cylonid.nativealpha.util.EntryPointUtils;
+import com.cylonid.nativealpha.util.IconHelper;
 import com.cylonid.nativealpha.util.LocaleUtils;
 import com.cylonid.nativealpha.util.Utility;
 import com.cylonid.nativealpha.util.WebViewLauncher;
@@ -77,7 +78,7 @@ public class WebViewActivity
     extends EdgeToEdgeActivity
     implements EasyPermissions.PermissionCallbacks {
 
-    private static final int ICON_SIZE = 192;
+    // Using standard icon size from IconHelper
 
     //Constants for touchlistener
     private static final int NONE = 0;
@@ -813,68 +814,17 @@ public class WebViewActivity
 
     private void updateTaskIcon() {
         if (webapp != null && webapp.getTitle() != null) {
-            String iconData = getSharedPreferences(
-                "custom_icons",
-                MODE_PRIVATE
-            ).getString(webapp.getTitle(), null);
-
-            if (iconData != null) {
-                try {
-                    byte[] decodedData = Base64.decode(
-                        iconData,
-                        Base64.DEFAULT
+            Bitmap bitmap = IconHelper.loadIconFromPreferences(
+                this,
+                webapp.getTitle()
+            );
+            if (bitmap != null) {
+                ActivityManager.TaskDescription taskDesc =
+                    new ActivityManager.TaskDescription(
+                        webapp.getTitle(),
+                        bitmap
                     );
-                    Bitmap bitmap = null;
-
-                    // First try to load as SVG
-                    try {
-                        String content = new String(decodedData, "UTF-8");
-                        if (
-                            content.trim().startsWith("<svg") ||
-                            content.trim().startsWith("<?xml")
-                        ) {
-                            SVG svg = SVG.getFromString(content);
-                            bitmap = Bitmap.createBitmap(
-                                ICON_SIZE,
-                                ICON_SIZE,
-                                Bitmap.Config.ARGB_8888
-                            );
-                            Canvas canvas = new Canvas(bitmap);
-                            svg.renderToCanvas(canvas);
-                        }
-                    } catch (Exception e) {
-                        Log.d("UpdateTaskIcon", "Not an SVG, trying as bitmap");
-                    }
-
-                    // If not SVG, try as regular bitmap
-                    if (bitmap == null) {
-                        bitmap = BitmapFactory.decodeByteArray(
-                            decodedData,
-                            0,
-                            decodedData.length
-                        );
-                    }
-
-                    if (bitmap != null) {
-                        // Ensure consistent size
-                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(
-                            bitmap,
-                            ICON_SIZE,
-                            ICON_SIZE,
-                            true
-                        );
-
-                        // Apply task description
-                        ActivityManager.TaskDescription taskDesc =
-                            new ActivityManager.TaskDescription(
-                                webapp.getTitle(),
-                                scaledBitmap
-                            );
-                        setTaskDescription(taskDesc);
-                    }
-                } catch (Exception e) {
-                    Log.e("UpdateTaskIcon", "Failed to process icon", e);
-                }
+                setTaskDescription(taskDesc);
             }
         }
     }
@@ -895,8 +845,8 @@ public class WebViewActivity
                 if (customIcon == null) {
                     Bitmap scaledIcon = Bitmap.createScaledBitmap(
                         icon,
-                        ICON_SIZE,
-                        ICON_SIZE,
+                        IconHelper.STANDARD_ICON_SIZE,
+                        IconHelper.STANDARD_ICON_SIZE,
                         true
                     );
                     try {

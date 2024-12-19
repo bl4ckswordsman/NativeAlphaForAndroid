@@ -46,7 +46,7 @@ class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activit
                 WebAppSettingsActivity::class.java
             )
             intent.putExtra(Const.INTENT_WEBAPPID, item.ID)
-            intent.setAction(Intent.ACTION_VIEW)
+            intent.action = Intent.ACTION_VIEW
             startActivity(activityOfFragment, intent, null)
         }
 
@@ -66,7 +66,7 @@ class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activit
     private fun buildDeleteItemDialog(ID: Int) {
         val builder = AlertDialog.Builder(activityOfFragment)
         builder.setMessage(getString(R.string.delete_question))
-        builder.setPositiveButton(getString(android.R.string.yes)) { _: DialogInterface?, _: Int ->
+        builder.setPositiveButton(getString(android.R.string.ok)) { _: DialogInterface?, _: Int ->
             val webapp = DataManager.getInstance().getWebApp(ID)
             if (webapp != null) {
                 webapp.markInactive()
@@ -74,7 +74,7 @@ class WebAppListAdapter(dataSet: List<WebApp> = emptyList(), private val activit
             }
             updateWebAppList()
         }
-        builder.setNegativeButton(getString(android.R.string.no)
+        builder.setNegativeButton(getString(android.R.string.cancel)
         ) { dialog: DialogInterface, _: Int -> dialog.cancel() }
         val dialog = builder.create()
         dialog.show()

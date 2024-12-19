@@ -30,7 +30,7 @@ class WebAppListFragment : Fragment(R.layout.fragment_web_app_list) {
         list.disableSwipeDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
     }
 
-    public fun updateWebAppList() {
+    fun updateWebAppList() {
         adapter.updateWebAppList()
     }
 

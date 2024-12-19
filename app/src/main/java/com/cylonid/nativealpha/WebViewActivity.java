@@ -72,6 +72,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -276,11 +277,7 @@ public class WebViewActivity
                     if (dl_url != null && !dl_url.equals("")) {
                         if (dl_url.startsWith("blob:")) {
                             dl_url = dl_url.replace("blob:", "");
-                            try {
-                                dl_url = URLDecoder.decode(dl_url, "UTF-8");
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
+                            dl_url = URLDecoder.decode(dl_url, StandardCharsets.UTF_8);
                         }
                         DownloadManager.Request request = null;
                         try {
@@ -1066,7 +1063,7 @@ public class WebViewActivity
                         Manifest.permission.ACCESS_FINE_LOCATION,
                     },
                     Const.PERMISSION_RC_LOCATION,
-                    Arrays.asList(new String[] {}),
+                    List.of(),
                     new String[] {},
                     () -> webapp.setAllowLocationAccess(true)
                 );

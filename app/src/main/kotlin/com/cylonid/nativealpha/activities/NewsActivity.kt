@@ -1,4 +1,4 @@
-package com.cylonid.nativealpha.activities;
+package com.cylonid.nativealpha.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent

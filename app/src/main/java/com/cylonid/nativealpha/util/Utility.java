@@ -59,7 +59,7 @@ public final class Utility {
         for (ShortcutInfo info : manager.getPinnedShortcuts()) {
             int id = info.getIntent().getIntExtra(Const.INTENT_WEBAPPID, -1);
             if (removableWebAppIds.contains(id)) {
-                manager.disableShortcuts(Arrays.asList(info.getId()), App.getAppContext().getString(R.string.webapp_already_deleted));
+                manager.disableShortcuts(List.of(info.getId()), App.getAppContext().getString(R.string.webapp_already_deleted));
             }
         }
     }
@@ -84,8 +84,7 @@ public final class Utility {
             view.setAlpha(0.75f);
         }
 
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
+        if (view instanceof ViewGroup viewGroup) {
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View child = viewGroup.getChildAt(i);
                 setViewAndChildrenEnabled(child, enabled);

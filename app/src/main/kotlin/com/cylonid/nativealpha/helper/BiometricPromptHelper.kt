@@ -12,8 +12,8 @@ import com.google.android.material.snackbar.Snackbar
 
 internal class BiometricPromptHelper(private val activity: FragmentActivity) {
     fun showPrompt(funSuccess: BiometricPromptCallback, funFail: BiometricPromptCallback, promptTitle: String) {
-        val supported = isBiometricsSupported(activity);
-        if(!supported) return;
+        val supported = isBiometricsSupported(activity)
+        if(!supported) return
         val executor = ContextCompat.getMainExecutor(activity)
         val biometricPrompt = BiometricPrompt(
             activity,
@@ -49,10 +49,10 @@ internal class BiometricPromptHelper(private val activity: FragmentActivity) {
                 isSupported = true
             }
             BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                Utility.showInfoSnackbar(activity as AppCompatActivity?, activity.getString(R.string.no_biometric_keys_enrolled), Snackbar.LENGTH_LONG);
+                Utility.showInfoSnackbar(activity as AppCompatActivity?, activity.getString(R.string.no_biometric_keys_enrolled), Snackbar.LENGTH_LONG)
             }
             else -> {
-                Utility.showInfoSnackbar(activity as AppCompatActivity?, activity.getString(R.string.no_biometric_devices), Snackbar.LENGTH_LONG);
+                Utility.showInfoSnackbar(activity as AppCompatActivity?, activity.getString(R.string.no_biometric_devices), Snackbar.LENGTH_LONG)
             }
         }
         return isSupported

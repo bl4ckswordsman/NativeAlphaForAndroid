@@ -99,7 +99,7 @@ class MainActivity : EdgeToEdgeActivity() {
             val webapps = DataManager.getInstance().activeWebsites
             for (i in webapps.indices.reversed()) {
                 val webapp = webapps[i]
-                val last_webapp = i == webapps.size - 1
+                i == webapps.size - 1
                 val msg = Html.fromHtml(
                     getString(R.string.restore_shortcut, webapp.title),
                     Html.FROM_HTML_MODE_COMPACT

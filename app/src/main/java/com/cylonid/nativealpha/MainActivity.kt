@@ -12,7 +12,6 @@ import android.widget.Switch
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.cylonid.nativealpha.fragments.webapplist.WebAppListFragment
 import com.cylonid.nativealpha.model.DataManager
@@ -23,7 +22,7 @@ import com.cylonid.nativealpha.util.Utility
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : EdgeToEdgeActivity() {
     private var webAppListFragment: WebAppListFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { buildAddWebsiteDialog(getString(R.string.add_webapp)) }
         personalizeToolbar()
+
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -66,10 +66,16 @@ class MainActivity : AppCompatActivity() {
     private fun personalizeToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         toolbar.setLogo(R.mipmap.native_alpha_white)
-        @StringRes val appName =
-            if (BuildConfig.FLAVOR != "extended") R.string.app_name else R.string.app_name_plus
-        toolbar.setTitle(appName)
         setSupportActionBar(toolbar)
+
+        supportActionBar?.apply {
+            @StringRes val appName =
+                if (BuildConfig.FLAVOR != "extended") R.string.app_name else R.string.app_name_plus
+            setTitle(appName)
+            setDisplayShowTitleEnabled(true)
+            setDisplayUseLogoEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
     }
 
     private fun buildImportSuccessDialog() {
@@ -77,7 +83,7 @@ class MainActivity : AppCompatActivity() {
 
         val message = """
             ${getString(R.string.import_success_dialog_txt2)}
-            
+
             ${getString(R.string.import_success_dialog_txt3)}
             """.trimIndent()
 
@@ -188,5 +194,3 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 }
-
-

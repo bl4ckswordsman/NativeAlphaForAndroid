@@ -11,7 +11,7 @@ import com.cylonid.nativealpha.model.WebApp;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class UITests {
     @Rule
     public ActivityTestRule<MainActivity> activityTestRule = new ActivityTestRule<>(MainActivity.class);
 //    public ActivityScenarioRule<MainActivity> scenarioRule = new ActivityScenarioRule<>(MainActivity.class);
-    @org.junit.jupiter.api.Test
+    @Test
     public void addWebsite() {
         TestUtils.acceptLicense();
         onView(withId(R.id.websiteUrl)).perform(clearText(), typeText("github.com"));
@@ -62,7 +62,7 @@ public class UITests {
         onView(allOf(withId(R.id.btnOpenWebview), isDisplayed())).perform(click());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void addMultipleWebsiteAndTestLoadedUrl() {
         initMultipleWebsites(List.of("github.com", "orf.at"));
         onView(TestUtils.getElementFromMatchAtPosition(withId(R.id.btnOpenWebview), 1)).perform(click());
@@ -81,14 +81,14 @@ public class UITests {
 
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void startWebView() {
         initSingleWebsite("https://github.com");
         onView(allOf(withId(R.id.btnOpenWebview))).perform(click());
         onView(withId(R.id.webview)).check(matches(isDisplayed()));
     }
 
-    @org.junit.jupiter.api.Test(expected = NoMatchingViewException.class)
+    @Test(expected = NoMatchingViewException.class)
     public void deleteWebsite() {
         initSingleWebsite("https://github.com");
         onView(allOf(withId(R.id.btnDelete))).perform(click());
@@ -97,7 +97,7 @@ public class UITests {
         onView(allOf(withId(R.id.btnDelete))).check(matches(not(isDisplayed()))); //Throws exception
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void changeWebAppSettings() {
         initSingleWebsite("https://whatismybrowser.com/detect/are-third-party-cookies-enabled");
         onView(withId(R.id.btnSettings)).perform(click());
@@ -107,7 +107,7 @@ public class UITests {
         onWebView(Matchers.allOf(withId(R.id.webview))).withNoTimeout().withElement(findElement(Locator.ID, "detected_value")).check(webMatches(getText(), containsString("Yes")));
 
     }
-    @org.junit.jupiter.api.Test
+    @Test
     public void badSSLAccept() {
         initSingleWebsite("https://untrusted-root.badssl.com/");
         onView(allOf(withId(R.id.btnOpenWebview), isDisplayed())).perform(click());
@@ -116,7 +116,7 @@ public class UITests {
         onWebView(Matchers.allOf(withId(R.id.webview))).withNoTimeout().withElement(findElement(Locator.ID, "content")).check(webMatches(getText(), containsString("untrusted-root")));
     }
 
-    @org.junit.jupiter.api.Test(expected = java.lang.RuntimeException.class)
+    @Test(expected = java.lang.RuntimeException.class)
     public void badSSLDismiss() {
         initSingleWebsite("https://untrusted-root.badssl.com/");
         onView(allOf(withId(R.id.btnOpenWebview), isDisplayed())).perform(click());
@@ -126,7 +126,7 @@ public class UITests {
 
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void openHTTPSite() {
         initSingleWebsite("http://httpforever.com/");
         onView(allOf(withId(R.id.btnOpenWebview), isDisplayed())).perform(click());

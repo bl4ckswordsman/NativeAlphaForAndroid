@@ -41,18 +41,26 @@ public class IconHelper {
     public static void handleWebAppIcon(Context context, WebApp webapp, Bitmap icon, boolean isWebView) {
         if (icon == null || webapp.getTitle() == null) return;
 
+        if (icon == null || webapp.getTitle() == null) return;
+
         // Check if custom icon already exists
         String customIcon = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .getString(webapp.getTitle(), null);
-        if (customIcon != null) return;
+        if (customIcon != null) {
+            // If custom icon exists, load it instead
+            Bitmap savedIcon = loadIconFromPreferences(context, webapp.getTitle());
+            if (savedIcon != null && isWebView && context instanceof Activity) {
+                ((Activity)context).setTaskDescription(
+                    new ActivityManager.TaskDescription(
+                        webapp.getTitle(),
+                        savedIcon
+                    )
+                );
+            }
+            return;
+        }
 
-        // Scale icon to standard size
-        Bitmap scaledIcon = Bitmap.createScaledBitmap(
-            icon, 
-            STANDARD_ICON_SIZE, 
-            STANDARD_ICON_SIZE, 
-            true
-        );
+        Bitmap scaledIcon = createSquareBitmap(icon);
 
         // Save icon
         saveCustomIconToSharedPreferences(context, webapp.getTitle(), scaledIcon);
@@ -87,12 +95,7 @@ public class IconHelper {
         if (url != null && !url.isEmpty()) {
             Bitmap fetchedIcon = fetchIconFromUrl(url);
             if (fetchedIcon != null) {
-                Bitmap scaledIcon = Bitmap.createScaledBitmap(
-                    fetchedIcon,
-                    STANDARD_ICON_SIZE, 
-                    STANDARD_ICON_SIZE,
-                    true
-                );
+                Bitmap scaledIcon = createSquareBitmap(fetchedIcon);
                 saveCustomIconToSharedPreferences(context, title, scaledIcon);
                 memoryCache.put(title, scaledIcon);
                 return scaledIcon;
@@ -170,15 +173,11 @@ public class IconHelper {
 
         // Ensure consistent size if bitmap exists
         if (bitmap != null) {
-            bitmap = Bitmap.createScaledBitmap(
-                bitmap,
-                STANDARD_ICON_SIZE,
-                STANDARD_ICON_SIZE,
-                true
-            );
+            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         }
 
-        return bitmap;
+        // Always return scaled bitmap
+        return bitmap != null ? createSquareBitmap(bitmap) : null;
     }
 
     public static Bitmap loadSvg(String strUrl) {
@@ -211,34 +210,10 @@ public class IconHelper {
             return null;
         }
     }
-
-    public static Bitmap loadBitmap(String strUrl) {
-        try {
-            URL url = new URL(strUrl);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            String contentType = con.getContentType();
-
-            // Handle SVG content
-            if (contentType != null && contentType.contains("svg")) {
-                return loadSvg(strUrl);
-            }
-
-            // Handle regular image formats
-            InputStream is = con.getInputStream();
-            Bitmap bitmap = BitmapFactory.decodeStream(is);
-            if (bitmap == null || bitmap.getWidth() < Const.FAVICON_MIN_WIDTH) return null;
-            return bitmap;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+    
 
     public static void saveCustomIconToSharedPreferences(Context context, String shortcutTitle, Bitmap bitmap) {
         if (bitmap != null) {
-            // Resize bitmap to standard size for consistent display
-            bitmap = Bitmap.createScaledBitmap(bitmap, STANDARD_ICON_SIZE, STANDARD_ICON_SIZE, true);
-
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
             String encodedBitmap = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
@@ -253,10 +228,31 @@ public class IconHelper {
     public static void saveCustomSvgToSharedPreferences(String shortcutTitle, String svgContent) {
         if (svgContent != null) {
             String encodedSvg = Base64.encodeToString(svgContent.getBytes(), Base64.DEFAULT);
-            getAppContext().getSharedPreferences("custom_icons", Context.MODE_PRIVATE)
+            getAppContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                     .edit()
                     .putString(shortcutTitle, encodedSvg)
                     .apply();
         }
+    }
+
+    public static Bitmap createSquareBitmap(Bitmap bitmap) {
+        if (bitmap == null) return null;
+    
+        // Calculate target dimensions preserving aspect ratio
+        float scale = (float) STANDARD_ICON_SIZE / Math.max(bitmap.getWidth(), bitmap.getHeight());
+        int targetWidth = Math.round(bitmap.getWidth() * scale);
+        int targetHeight = Math.round(bitmap.getHeight() * scale);
+    
+        // Create square bitmap with transparent background
+        Bitmap result = Bitmap.createBitmap(STANDARD_ICON_SIZE, STANDARD_ICON_SIZE, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        
+        // Scale and center the bitmap
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
+        float left = (STANDARD_ICON_SIZE - targetWidth) / 2f;
+        float top = (STANDARD_ICON_SIZE - targetHeight) / 2f;
+        canvas.drawBitmap(scaledBitmap, left, top, null);
+    
+        return result;
     }
 }

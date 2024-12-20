@@ -2,6 +2,7 @@ package com.cylonid.nativealpha.model
 
 import android.view.View
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.FragmentActivity
 import com.cylonid.nativealpha.R
 import com.cylonid.nativealpha.WebAppSettingsActivity
@@ -145,22 +146,22 @@ class WebApp {
             .replace("www", "")
 
     fun onSwitchCookiesChanged(mSwitch: CompoundButton, isChecked: Boolean) {
-        val switchThirdPCookies = mSwitch.rootView.findViewById<Switch>(R.id.switch3PCookies)
+        val switchThirdPCookies = mSwitch.rootView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switch3PCookies)
         if (isChecked) switchThirdPCookies.isEnabled = true else {
             switchThirdPCookies.isEnabled = false
             switchThirdPCookies.isChecked = false
         }
     }
 
-    private fun disableSwitchBiometricAccessChangeListener(switchBiometricAccess: Switch) {
-        switchBiometricAccess.setOnCheckedChangeListener(null)
+    private fun disableSwitchBiometricAccessChangeListener(switchBiometricAccess: SwitchCompat?) {
+        switchBiometricAccess?.setOnCheckedChangeListener(null)
     }
 
     private fun enableSwitchBiometricAccessChangeListener(
-        switchBiometricAccess: Switch,
+        switchBiometricAccess: SwitchCompat?,
         activity: WebAppSettingsActivity
     ) {
-        switchBiometricAccess.setOnCheckedChangeListener { switch, checked ->
+        switchBiometricAccess?.setOnCheckedChangeListener { switch, checked ->
             onSwitchBiometricAccessChanged(
                 switch,
                 checked,
@@ -171,11 +172,11 @@ class WebApp {
 
     private fun setSwitchBiometricAccessSilently(
         newValue: Boolean,
-        switchBiometricAccess: Switch,
+        switchBiometricAccess: SwitchCompat?,
         activity: WebAppSettingsActivity
     ) {
         disableSwitchBiometricAccessChangeListener(switchBiometricAccess)
-        switchBiometricAccess.isChecked = newValue
+        switchBiometricAccess?.isChecked = newValue
         enableSwitchBiometricAccessChangeListener(switchBiometricAccess, activity)
     }
 
@@ -185,7 +186,7 @@ class WebApp {
         activity: WebAppSettingsActivity
     ) {
         val switchBiometricAccess =
-            mSwitch.rootView.findViewById<Switch>(R.id.switchBiometricAccess)
+            mSwitch.rootView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchBiometricAccess)
 
         // reset to value before user toggled, actual setting of value is done by prompt success callback
         setSwitchBiometricAccessSilently(
@@ -213,8 +214,8 @@ class WebApp {
     }
 
     fun onSwitchJsChanged(mSwitch: CompoundButton, isChecked: Boolean) {
-        val switchDesktopVersion = mSwitch.rootView.findViewById<Switch>(R.id.switchDesktopSite)
-        val switchAdblock = mSwitch.rootView.findViewById<Switch>(R.id.switchAdblock)
+        val switchDesktopVersion = mSwitch.rootView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchDesktopSite)
+        val switchAdblock = mSwitch.rootView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchAdblock)
         if (isChecked) {
             switchDesktopVersion.isEnabled = true
             switchAdblock.isEnabled = true
@@ -227,7 +228,7 @@ class WebApp {
     }
 
     fun onSwitchForceDarkChanged(mSwitch: CompoundButton, isChecked: Boolean) {
-        val switchLimit = mSwitch.rootView.findViewById<Switch>(R.id.switchTimeSpanDarkMode)
+        val switchLimit = mSwitch.rootView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchTimeSpanDarkMode)
         val txtBegin = mSwitch.rootView.findViewById<EditText>(R.id.textDarkModeBegin)
         val txtEnd = mSwitch.rootView.findViewById<EditText>(R.id.textDarkModeEnd)
         if (isChecked) {
@@ -262,7 +263,7 @@ class WebApp {
 
     fun onSwitchUserAgentChanged(mSwitch: CompoundButton, isChecked: Boolean) {
         val txt = mSwitch.rootView.findViewById<EditText>(R.id.textUserAgent)
-        val switchDesktopVersion = mSwitch.rootView.findViewById<Switch>(R.id.switchDesktopSite)
+        val switchDesktopVersion = mSwitch.rootView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchDesktopSite)
         if (isChecked) {
             switchDesktopVersion.isChecked = false
             switchDesktopVersion.isEnabled = false

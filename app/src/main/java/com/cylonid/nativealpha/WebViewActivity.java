@@ -1,6 +1,7 @@
 package com.cylonid.nativealpha;
 
 import static com.cylonid.nativealpha.util.Const.CODE_OPEN_FILE;
+import static com.cylonid.nativealpha.util.IconHelper.createSquareBitmap;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -814,16 +815,12 @@ public class WebViewActivity
 
     private void updateTaskIcon() {
         if (webapp != null && webapp.getTitle() != null) {
-            Bitmap bitmap = IconHelper.loadIconFromPreferences(
-                this,
-                webapp.getTitle()
-            );
+            Bitmap bitmap = IconHelper.loadIconFromPreferences(this, webapp.getTitle());
             if (bitmap != null) {
-                ActivityManager.TaskDescription taskDesc =
-                    new ActivityManager.TaskDescription(
-                        webapp.getTitle(),
-                        bitmap
-                    );
+                ActivityManager.TaskDescription taskDesc = new ActivityManager.TaskDescription(
+                    webapp.getTitle(),
+                    bitmap
+                );
                 setTaskDescription(taskDesc);
             }
         }
@@ -835,7 +832,14 @@ public class WebViewActivity
 
         @Override
         public void onReceivedIcon(WebView view, Bitmap icon) {
-            IconHelper.handleWebAppIcon(WebViewActivity.this, webapp, icon, true);
+            // Only handle received icon if no custom icon exists
+            String customIcon = getSharedPreferences("custom_icons", MODE_PRIVATE)
+                    .getString(webapp.getTitle(), null);
+            
+            if (customIcon == null) {
+                Bitmap scaledIcon = createSquareBitmap(icon);
+                IconHelper.handleWebAppIcon(WebViewActivity.this, webapp, scaledIcon, true);
+            }
         }
 
         private WebChromeClient.CustomViewCallback mCustomViewCallback;

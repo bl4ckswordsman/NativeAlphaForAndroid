@@ -2,13 +2,19 @@ package com.cylonid.nativealpha.util;
 
 import static com.cylonid.nativealpha.util.App.getAppContext;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.util.Base64;
 import android.util.Log;
+
+import androidx.collection.LruCache;
+
 import com.caverock.androidsvg.SVG;
+import com.cylonid.nativealpha.model.WebApp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -18,6 +24,102 @@ import java.net.URL;
 public class IconHelper {
 
     public static final int STANDARD_ICON_SIZE = 192;
+    private static final String PREFS_NAME = "custom_icons";
+    private static final LruCache<String, Bitmap> memoryCache;
+
+    static {
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        memoryCache = new LruCache<>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+    }
+
+    public static void handleWebAppIcon(Context context, WebApp webapp, Bitmap icon, boolean isWebView) {
+        if (icon == null || webapp.getTitle() == null) return;
+
+        // Check if custom icon already exists
+        String customIcon = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .getString(webapp.getTitle(), null);
+        if (customIcon != null) return;
+
+        // Scale icon to standard size
+        Bitmap scaledIcon = Bitmap.createScaledBitmap(
+            icon, 
+            STANDARD_ICON_SIZE, 
+            STANDARD_ICON_SIZE, 
+            true
+        );
+
+        // Save icon
+        saveCustomIconToSharedPreferences(context, webapp.getTitle(), scaledIcon);
+        
+        // Cache in memory
+        memoryCache.put(webapp.getTitle(), scaledIcon);
+
+        // Update task description if in WebView
+        if (isWebView && context instanceof Activity) {
+            ((Activity)context).setTaskDescription(
+                new ActivityManager.TaskDescription(
+                    webapp.getTitle(),
+                    scaledIcon
+                )
+            );
+        }
+    }
+
+    public static Bitmap loadOrFetchIcon(Context context, String url, String title) {
+        // Try memory cache first
+        Bitmap cachedIcon = memoryCache.get(title);
+        if (cachedIcon != null) return cachedIcon;
+
+        // Try stored preferences
+        Bitmap storedIcon = loadIconFromPreferences(context, title);
+        if (storedIcon != null) {
+            memoryCache.put(title, storedIcon);
+            return storedIcon;
+        }
+
+        // Fetch from network
+        if (url != null && !url.isEmpty()) {
+            Bitmap fetchedIcon = fetchIconFromUrl(url);
+            if (fetchedIcon != null) {
+                Bitmap scaledIcon = Bitmap.createScaledBitmap(
+                    fetchedIcon,
+                    STANDARD_ICON_SIZE, 
+                    STANDARD_ICON_SIZE,
+                    true
+                );
+                saveCustomIconToSharedPreferences(context, title, scaledIcon);
+                memoryCache.put(title, scaledIcon);
+                return scaledIcon;
+            }
+        }
+
+        return null;
+    }
+
+    private static Bitmap fetchIconFromUrl(String strUrl) {
+        try {
+            URL url = new URL(strUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            String contentType = con.getContentType();
+
+            if (contentType != null && contentType.contains("svg")) {
+                return loadSvg(strUrl);
+            }
+
+            InputStream is = con.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            return (bitmap != null && bitmap.getWidth() >= Const.FAVICON_MIN_WIDTH) ? bitmap : null;
+        } catch (Exception e) {
+            Log.e("IconHelper", "Error fetching icon", e);
+            return null;
+        }
+    }
 
     public static Bitmap loadIconFromPreferences(
         Context context,

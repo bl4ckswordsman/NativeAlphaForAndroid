@@ -835,32 +835,7 @@ public class WebViewActivity
 
         @Override
         public void onReceivedIcon(WebView view, Bitmap icon) {
-            super.onReceivedIcon(view, icon);
-            if (icon != null) {
-                // Only update icon if no custom icon is set
-                String customIcon = getSharedPreferences(
-                    "custom_icons",
-                    MODE_PRIVATE
-                ).getString(webapp.getTitle(), null);
-                if (customIcon == null) {
-                    Bitmap scaledIcon = Bitmap.createScaledBitmap(
-                        icon,
-                        IconHelper.STANDARD_ICON_SIZE,
-                        IconHelper.STANDARD_ICON_SIZE,
-                        true
-                    );
-                    try {
-                        setTaskDescription(
-                            new ActivityManager.TaskDescription(
-                                webapp.getTitle(),
-                                scaledIcon
-                            )
-                        );
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            IconHelper.handleWebAppIcon(WebViewActivity.this, webapp, icon, true);
         }
 
         private WebChromeClient.CustomViewCallback mCustomViewCallback;

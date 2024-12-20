@@ -275,7 +275,11 @@ public class ShortcutDialogFragment extends DialogFragment {
     private void startFaviconFetching() {
         faviconFetcherThread = new Thread(() -> {
             String[] webappdata = fetchWebappData();
-            bitmap = IconHelper.loadBitmap(webappdata[Const.RESULT_IDX_FAVICON]);
+            bitmap = IconHelper.loadOrFetchIcon(
+                requireActivity(), 
+                webappdata[Const.RESULT_IDX_FAVICON],
+                webapp.getTitle()
+            );
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
                     applyNewBitmapToDialog();
@@ -285,15 +289,6 @@ public class ShortcutDialogFragment extends DialogFragment {
             }
         });
         faviconFetcherThread.start();
-
-        new CountDownTimer(5000, 5000) {
-            @Override
-            public void onTick(long millisUntilFinished) {}
-
-            public void onFinish() {
-                faviconFetcherThread.interrupt();
-            }
-        }.start();
     }
 
     private void addShortcutToHomeScreen(Bitmap bitmap) {

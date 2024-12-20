@@ -7,6 +7,16 @@
 [![GitHub license](https://img.shields.io/github/license/cylonid/NativeAlphaForAndroid?color=orange)](https://github.com/cylonid/NativeAlphaForAndroid/blob/master/LICENSE)
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
 
+> [!NOTE]
+> This fork of the [original NativeAlpha](https://github.com/cylonid/NativeAlphaForAndroid) doesn't have any of the paid features of the paid version(get the app in Play Store to show support for the developer for that), nor does it have AdBlock functionality (couldn't build the app to test it otherwise, adblock library is not available anymore).
+> It differes from the original project for:
+> - adding support for Android 15 edge-to-edge enforcement
+> - updating some dependecies and having some simple code refactoring
+> - adding support for fetching icons from more sites (with SVG parsing)
+> - using specific site icons in recent apps view, for each separate shortcut
+> 
+> I might try to bring these optimizations to the original repo, depending on time constrains and the original developer's plans.
+
 
 ## Features
   * Shows any website in a borderless full-screen window using Android System WebView.

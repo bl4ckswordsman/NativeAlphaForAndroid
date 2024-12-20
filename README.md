@@ -31,37 +31,45 @@
 * General, technical version updates
 
 ## FAQ
-*Q: Why would I need this app if any mobile browser can do the same?*
-
+<details> 
+<summary><i> Q: Why would I need this app if any mobile browser can do the same? </i></summary>
 A: Mobile browsers usually only are able to create shortcuts which give a native, borderless fullscreen experience if the website has a Progressive Web App (PWA) manifest. Unfortunately, most websites do not offer this feature yet. Additionally, you cannot set different settings for different websites with an usual browser.
+</details>
 
-*Q: Can I keep multiple log-in sessions of the same website?*
-
+<details> 
+<summary><i> Q: Can I keep multiple log-in sessions of the same website? </i></summary>
 A: Yes, this is possible using the sandbox feature of Native Alpha Plus.
+</details>
 
-*Q: Why isn't the sandbox feature in Native Alpha Plus enabled by default?*
-
+<details> 
+<summary><i> Q: Why isn't the sandbox feature in Native Alpha Plus enabled by default? </i></summary>
 A: The sandboxing approach is recommended for specific usage rather than general usage because it can limit the performance of the application and increase the disk usage. Therefore, use it for privacy-invasive websites or websites where you want to be logged in twice, but not for any website just because you can.
+</details>
 
-*Q: Is this app a dedicated web browser with its own browser engine?*
-
+<details> 
+<summary><i> Q: Is this app a dedicated web browser with its own browser engine? </i></summary>
 A: No. As stated, this app relies on the system built-in Android WebView in order to display the website. For privacy reasons, you can opt to use alternative webviews such as [Bromite](https://www.bromite.org/system_web_view) on rooted phones. Always make sure to use to most recent version of any WebView implementation you use!
+</details>
 
-*Q: Why is it not possible to find an icon for a certain website?*
-
+<details>
+<summary><i> Q: Why is it not possible to find an icon for a certain website? </i></summary>
 A: This problem can occur due to multiple reasons. In most cases, the website does not offer a high-resolution icon. If you are a website maintainer and your website icon cannot be found, look at [RealFaviconGenerator](https://realfavicongenerator.net) for further information. If you think it should work, feel free to post the URL and I will look into it.
+</details>
 
-*Q: In constrast to your promise, this app has a large memory footprint!*
-
+<details>
+<summary><i> Q: In constrast to your promise, this app has a large memory footprint! </i></summary>
 A: This is because Native Alpha makes use of caching in the same way your browser app does, i.e., it saves web content locally on your device. Then it can be loaded faster if you visit the same page again. You can either delete cache regularly yourself or set the "Clear cache after usage" setting in the global settings if memory footprint is a concern for you. However, then websites will take a longer time to load because everything has to be loaded from net.
+</details>
 
-*Q: What is the minimum Android version for running Native Alpha?*
-
+<details>
+<summary><i> Q: What is the minimum Android version for running Native Alpha? </i></summary>
 A: Oreo (8.0). This is because older versions use a discontinued API for creating screenshots which currently is not implemented.
+</details>
 
-*Q: I don't want to use Google Play services, is there any other way to obtain Native Alpha Plus?*
-
+<details>
+<summary><i> Q: I don't want to use Google Play services, is there any other way to obtain Native Alpha Plus? </i></summary>
 A: You can build the app yourself, everything is open-source including the paid features.
+</details>
 
 ## Used libraries/resources
 * [CircularProgressBar](https://github.com/lopspower/CircularProgressBar)
@@ -80,12 +88,15 @@ For testing purposes:
 A list of used open-source libraries can also be found inside the app ("About" section).
 
 ## Screenshots
+<details>
+<summary> Click to see screenshots </summary>
 <div style="text-align: center; margin: auto;">
 <img src="graphics/screenshots/mainScreen.png" alt="Main Screen" width="350"/>
 <img src="graphics/screenshots/addWebApp.png" alt="Add Web App" width="350"/>
 <img src="graphics/screenshots/webAppSettings.png" alt="Available Web App Settings" width="350"/>
 <img src="graphics/screenshots/globalSettings.png" alt="Global Settings" width="350"/>
 </div>
+</details>
 
 
 ## License

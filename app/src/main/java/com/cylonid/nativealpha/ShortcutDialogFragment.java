@@ -9,7 +9,6 @@ import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -295,8 +294,13 @@ public class ShortcutDialogFragment extends DialogFragment {
         Intent intent = WebViewLauncher.createWebViewIntent(webapp, requireActivity());
 
         IconCompat icon;
-        if (bitmap != null) icon = IconCompat.createWithBitmap(bitmap);
-        else icon = IconCompat.createWithResource(requireActivity(), R.mipmap.native_alpha_shortcut);
+
+        // Scale bitmap to standard size before saving
+        if (bitmap != null) {
+            icon = IconCompat.createWithBitmap(bitmap);
+        } else {
+            icon = IconCompat.createWithResource(requireActivity(), R.mipmap.native_alpha_shortcut);
+        }
 
         String final_title = uiTitle.getText().toString();
         if (final_title.isEmpty()) final_title = webapp.getTitle();

@@ -154,7 +154,7 @@ class MainActivity : EdgeToEdgeActivity() {
     private fun buildAddWebsiteDialog(title: String) {
         val inflated_view = layoutInflater.inflate(R.layout.add_website_dialogue, null)
         val url = inflated_view.findViewById<EditText>(R.id.websiteUrl)
-        val create_shortcut = inflated_view.findViewById<Switch>(R.id.switchCreateShortcut)
+        val create_shortcut = inflated_view.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchCreateShortcut)
 
         val dialog = AlertDialog.Builder(this@MainActivity)
             .setView(inflated_view)

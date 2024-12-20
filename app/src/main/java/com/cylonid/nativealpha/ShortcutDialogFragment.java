@@ -7,13 +7,10 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,18 +25,16 @@ import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.DialogFragment;
-import com.caverock.androidsvg.SVG;
 import com.cylonid.nativealpha.model.DataManager;
 import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.App;
 import com.cylonid.nativealpha.util.Const;
+import com.cylonid.nativealpha.util.IconHelper;
 import com.cylonid.nativealpha.util.Utility;
 import com.cylonid.nativealpha.util.WebViewLauncher;
 import com.google.android.material.snackbar.Snackbar;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -85,26 +80,15 @@ public class ShortcutDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onActivityResult(
-        int requestCode,
-        int resultCode,
-        @Nullable Intent data
-    ) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CODE_OPEN_FILE && resultCode == RESULT_OK) {
             Uri uri = data.getData();
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(
-                    requireActivity().getContentResolver(),
-                    uri
-                );
+                bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
                 if (bitmap != null) applyNewBitmapToDialog();
             } catch (IOException e) {
-                Utility.showToast(
-                    requireActivity(),
-                    getString(R.string.icon_not_found),
-                    Toast.LENGTH_SHORT
-                );
+                Utility.showToast(requireActivity(), getString(R.string.icon_not_found), Toast.LENGTH_SHORT);
                 e.printStackTrace();
             }
         }
@@ -113,20 +97,19 @@ public class ShortcutDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        final View view = getLayoutInflater()
-            .inflate(R.layout.shortcut_dialog, null);
+        final View view = getLayoutInflater().inflate(R.layout.shortcut_dialog, null);
 
         final AlertDialog dialog = new AlertDialog.Builder(requireActivity())
-            .setView(view)
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
-                addShortcutToHomeScreen(bitmap);
-                dismiss();
-            })
-            .setNegativeButton(android.R.string.cancel, (dialog1, which) -> {
-                dismiss();
-            })
-            .create();
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
+                    addShortcutToHomeScreen(bitmap);
+                    dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog1, which) -> {
+                    dismiss();
+                })
+                .create();
 
         uiTitle = view.findViewById(R.id.websiteTitle);
         uiFavicon = view.findViewById(R.id.favicon);
@@ -137,24 +120,13 @@ public class ShortcutDialogFragment extends DialogFragment {
             uiProgressBar.setVisibility(View.GONE);
             uiFavicon.setVisibility(View.VISIBLE);
 
-            if (uiTitle.getText().toString().equals("")) setShortcutTitle(
-                webapp.getTitle()
-            );
+            if (uiTitle.getText().toString().isEmpty()) setShortcutTitle(webapp.getTitle());
 
-            Intent intent = new Intent()
-                .setType("image/*")
-                .setAction(Intent.ACTION_GET_CONTENT);
+            Intent intent = new Intent().setType("image/*").setAction(Intent.ACTION_GET_CONTENT);
             try {
-                startActivityForResult(
-                    Intent.createChooser(intent, "Select an icon"),
-                    CODE_OPEN_FILE
-                );
+                startActivityForResult(Intent.createChooser(intent, "Select an icon"), CODE_OPEN_FILE);
             } catch (android.content.ActivityNotFoundException e) {
-                Utility.showInfoSnackbar(
-                    (AppCompatActivity) requireActivity(),
-                    getString(R.string.no_filemanager),
-                    Snackbar.LENGTH_LONG
-                );
+                Utility.showInfoSnackbar((AppCompatActivity) requireActivity(), getString(R.string.no_filemanager), Snackbar.LENGTH_LONG);
                 e.printStackTrace();
             }
         });
@@ -163,121 +135,19 @@ public class ShortcutDialogFragment extends DialogFragment {
         return dialog;
     }
 
-    private Bitmap loadSvg(String strUrl) {
-        try {
-            URL url = new URL(strUrl);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            InputStream is = con.getInputStream();
-
-            // Read SVG content as string
-            ByteArrayOutputStream result = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) != -1) {
-                result.write(buffer, 0, length);
-            }
-            String svgContent = result.toString("UTF-8");
-
-            // Save original SVG content
-            if (webapp != null && webapp.getTitle() != null) {
-                saveCustomSvgToSharedPreferences(webapp.getTitle(), svgContent);
-            }
-
-            // Create bitmap for display
-            SVG svg = SVG.getFromString(svgContent);
-            Bitmap bitmap = Bitmap.createBitmap(
-                192,
-                192,
-                Bitmap.Config.ARGB_8888
-            );
-            Canvas canvas = new Canvas(bitmap);
-            svg.renderToCanvas(canvas);
-
-            return bitmap;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private Bitmap loadBitmap(String strUrl) {
-        try {
-            URL url = new URL(strUrl);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            String contentType = con.getContentType();
-
-            // Handle SVG content
-            if (contentType != null && contentType.contains("svg")) {
-                return loadSvg(strUrl);
-            }
-
-            // Handle regular image formats
-            InputStream is = con.getInputStream();
-            Bitmap bitmap = BitmapFactory.decodeStream(is);
-            if (
-                bitmap == null || bitmap.getWidth() < Const.FAVICON_MIN_WIDTH
-            ) return null;
-            return bitmap;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     private TreeMap<Integer, String> buildIconMap() {
         TreeMap<Integer, String> found_icons = new TreeMap<>();
         if (base_url == null || base_url.equals("")) return found_icons;
-        String host_part = base_url
-            .replace("http://", "")
-            .replace("https://", "")
-            .replace("www.", "");
+        String host_part = base_url.replace("http://", "").replace("https://", "").replace("www.", "");
 
-        //No suitable icon
-
-        if (host_part.startsWith("amazon.")) found_icons.put(
-            300,
-            "https://upload.wikimedia.org/wikipedia/commons/d/de/Amazon_icon.png"
-        );
-
-        if (host_part.startsWith("paypal.")) found_icons.put(
-            196,
-            "https://www.paypalobjects.com/webstatic/icon/pp196.png"
-        );
-
-        if (host_part.startsWith("google.")) found_icons.put(
-            240,
-            "https://www.gstatic.com/images/branding/googleg/2x/googleg_standard_color_120dp.png"
-        );
-
-        // Size doesn't fit
-        if (host_part.startsWith("anchor.fm")) found_icons.put(
-            Integer.MAX_VALUE,
-            "https://d12xoj7p9moygp.cloudfront.net/favicon/apple-touch-icon-wave-152x152.png"
-        );
-
-        //OEBB has a typo in its web manifest
-        if (host_part.startsWith("oebb.at")) found_icons.put(
-            Integer.MAX_VALUE,
-            "https://www.oebb.at/.resources/pv-2017/themes/images/favicons/android-chrome-192x192.png"
-        );
-
-        //Wrong path in PWA manifest
-        if (host_part.startsWith("explosm.net")) found_icons.put(
-            Integer.MAX_VALUE,
-            "https://files.explosm.net/img/favicons/site/android-chrome-192x192.png"
-        );
-
-        //Path in PWA manifest is HTTP
-        if (host_part.startsWith("oe3.orf.at")) found_icons.put(
-            Integer.MAX_VALUE,
-            "https://tubestatic.orf.at/mojo/1_3/storyserver//tube/common/images/apple-icons/oe3.png"
-        );
-
-        //Non-existing path
-        if (host_part.startsWith("darfichrein.de")) found_icons.put(
-            Integer.MAX_VALUE,
-            "https://c.darfichrein.de/assets/img/logo1.png"
-        );
+        if (host_part.startsWith("amazon.")) found_icons.put(300, "https://upload.wikimedia.org/wikipedia/commons/d/de/Amazon_icon.png");
+        if (host_part.startsWith("paypal.")) found_icons.put(196, "https://www.paypalobjects.com/webstatic/icon/pp196.png");
+        if (host_part.startsWith("google.")) found_icons.put(240, "https://www.gstatic.com/images/branding/googleg/2x/googleg_standard_color_120dp.png");
+        if (host_part.startsWith("anchor.fm")) found_icons.put(Integer.MAX_VALUE, "https://d12xoj7p9moygp.cloudfront.net/favicon/apple-touch-icon-wave-152x152.png");
+        if (host_part.startsWith("oebb.at")) found_icons.put(Integer.MAX_VALUE, "https://www.oebb.at/.resources/pv-2017/themes/images/favicons/android-chrome-192x192.png");
+        if (host_part.startsWith("explosm.net")) found_icons.put(Integer.MAX_VALUE, "https://files.explosm.net/img/favicons/site/android-chrome-192x192.png");
+        if (host_part.startsWith("oe3.orf.at")) found_icons.put(Integer.MAX_VALUE, "https://tubestatic.orf.at/mojo/1_3/storyserver//tube/common/images/apple-icons/oe3.png");
+        if (host_part.startsWith("darfichrein.de")) found_icons.put(Integer.MAX_VALUE, "https://c.darfichrein.de/assets/img/logo1.png");
 
         return found_icons;
     }
@@ -287,22 +157,13 @@ public class ShortcutDialogFragment extends DialogFragment {
         TreeMap<Integer, String> found_icons = buildIconMap();
 
         try {
-            //Connect to the website
-            Document doc = Jsoup.connect(base_url)
-                .ignoreHttpErrors(true)
-                .userAgent(Const.DESKTOP_USER_AGENT)
-                .followRedirects(true)
-                .get();
+            Document doc = Jsoup.connect(base_url).ignoreHttpErrors(true).userAgent(Const.DESKTOP_USER_AGENT).followRedirects(true).get();
 
-            //Step 1: Check for META Redirect
             Elements metaTags = doc.select("meta[http-equiv=refresh]");
             if (!metaTags.isEmpty()) {
                 Element metaTag = metaTags.first();
                 String content = metaTag.attr("content");
-                Pattern pattern = Pattern.compile(
-                    ".*URL='?(.*)$",
-                    Pattern.CASE_INSENSITIVE
-                );
+                Pattern pattern = Pattern.compile(".*URL='?(.*)$", Pattern.CASE_INSENSITIVE);
                 Matcher m = pattern.matcher(content);
                 String redirectUrl = m.matches() ? m.group(1) : null;
                 if (redirectUrl != null) {
@@ -310,14 +171,11 @@ public class ShortcutDialogFragment extends DialogFragment {
                     doc = Jsoup.connect(base_url).followRedirects(true).get();
                 }
             }
-            //Step 2: Check PWA manifest
+
             Elements manifest = doc.select("link[rel=manifest]");
             if (!manifest.isEmpty()) {
                 Element mf = manifest.first();
-                String data = Jsoup.connect(mf.absUrl("href"))
-                    .ignoreContentType(true)
-                    .execute()
-                    .body();
+                String data = Jsoup.connect(mf.absUrl("href")).ignoreContentType(true).execute().body();
                 JSONObject json = new JSONObject(data);
 
                 try {
@@ -326,8 +184,7 @@ public class ShortcutDialogFragment extends DialogFragment {
                     if (!start_url.isEmpty()) {
                         URL base_url = new URL(mf.absUrl("href"));
                         URL fl_url = new URL(base_url, start_url);
-                        result[Const.RESULT_IDX_NEW_BASEURL] =
-                            fl_url.toString();
+                        result[Const.RESULT_IDX_NEW_BASEURL] = fl_url.toString();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -336,12 +193,8 @@ public class ShortcutDialogFragment extends DialogFragment {
                     JSONArray manifest_icons = json.getJSONArray("icons");
 
                     for (int i = 0; i < manifest_icons.length(); i++) {
-                        String icon_href = manifest_icons
-                            .getJSONObject(i)
-                            .getString("src");
-                        String sizes = manifest_icons
-                            .getJSONObject(i)
-                            .getString("sizes");
+                        String icon_href = manifest_icons.getJSONObject(i).getString("src");
+                        String sizes = manifest_icons.getJSONObject(i).getString("sizes");
                         Integer width = Utility.getWidthFromIcon(sizes);
                         URL base_url = new URL(mf.absUrl("href"));
                         URL full_url = new URL(base_url, icon_href);
@@ -351,22 +204,16 @@ public class ShortcutDialogFragment extends DialogFragment {
                     e.printStackTrace();
                 }
             }
-            //Step 3: Fallback to PNG icons
+
             if (found_icons.isEmpty()) {
                 Elements html_title = doc.select("title");
-                if (!html_title.isEmpty()) result[Const.RESULT_IDX_TITLE] =
-                    html_title.first().text();
+                if (!html_title.isEmpty()) result[Const.RESULT_IDX_TITLE] = html_title.first().text();
 
                 Elements icons = doc.select("link[rel=icon]");
                 icons.addAll(doc.select("link[rel=shortcut icon]"));
-                //If necessary, use apple icons
                 if (icons.size() < 3) {
-                    Elements apple_icons = doc.select(
-                        "link[rel=apple-touch-icon]"
-                    );
-                    Elements apple_icons_prec = doc.select(
-                        "link[rel=apple-touch-icon-precomposed]"
-                    );
+                    Elements apple_icons = doc.select("link[rel=apple-touch-icon]");
+                    Elements apple_icons_prec = doc.select("link[rel=apple-touch-icon-precomposed]");
                     icons.addAll(apple_icons);
                     icons.addAll(apple_icons_prec);
                 }
@@ -374,22 +221,21 @@ public class ShortcutDialogFragment extends DialogFragment {
                 for (Element icon : icons) {
                     String icon_href = icon.absUrl("href");
                     String sizes = icon.attr("sizes");
-                    if (!sizes.equals("")) {
+                    if (!sizes.isEmpty()) {
                         Integer width = Utility.getWidthFromIcon(sizes);
                         found_icons.put(width, icon_href);
                     } else found_icons.put(1, icon_href);
                 }
             }
 
-            // Step 4: Search common subdirectories for icons
             if (found_icons.isEmpty()) {
                 String[] commonPaths = {
-                    "/favicon.ico",
-                    "/static/favicon.ico",
-                    "/assets/favicon.ico",
-                    "/favicon.png",
-                    "/static/favicon.png",
-                    "/assets/favicon.png",
+                        "/favicon.ico",
+                        "/static/favicon.ico",
+                        "/assets/favicon.ico",
+                        "/favicon.png",
+                        "/static/favicon.png",
+                        "/assets/favicon.png",
                 };
                 for (String path : commonPaths) {
                     String iconUrl = base_url + path;
@@ -413,18 +259,14 @@ public class ShortcutDialogFragment extends DialogFragment {
 
     private boolean isValidIcon(String url) {
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(
-                url
-            ).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("HEAD");
             int responseCode = connection.getResponseCode();
             String contentType = connection.getContentType();
-            return (
-                responseCode == HttpURLConnection.HTTP_OK &&
-                (contentType.equals("image/x-icon") ||
-                    contentType.equals("image/png") ||
-                    contentType.equals("image/svg+xml"))
-            );
+            return (responseCode == HttpURLConnection.HTTP_OK &&
+                    (contentType.equals("image/x-icon") ||
+                            contentType.equals("image/png") ||
+                            contentType.equals("image/svg+xml")));
         } catch (IOException e) {
             return false;
         }
@@ -433,16 +275,13 @@ public class ShortcutDialogFragment extends DialogFragment {
     private void startFaviconFetching() {
         faviconFetcherThread = new Thread(() -> {
             String[] webappdata = fetchWebappData();
-            bitmap = loadBitmap(webappdata[Const.RESULT_IDX_FAVICON]);
+            bitmap = IconHelper.loadBitmap(webappdata[Const.RESULT_IDX_FAVICON]);
             if (isAdded()) {
-                requireActivity()
-                    .runOnUiThread(() -> {
-                        applyNewBitmapToDialog();
-                        setShortcutTitle(webappdata[Const.RESULT_IDX_TITLE]);
-                        applyNewBaseUrl(
-                            webappdata[Const.RESULT_IDX_NEW_BASEURL]
-                        );
-                    });
+                requireActivity().runOnUiThread(() -> {
+                    applyNewBitmapToDialog();
+                    setShortcutTitle(webappdata[Const.RESULT_IDX_TITLE]);
+                    applyNewBaseUrl(webappdata[Const.RESULT_IDX_NEW_BASEURL]);
+                });
             }
         });
         faviconFetcherThread.start();
@@ -458,116 +297,39 @@ public class ShortcutDialogFragment extends DialogFragment {
     }
 
     private void addShortcutToHomeScreen(Bitmap bitmap) {
-        Intent intent = WebViewLauncher.createWebViewIntent(
-            webapp,
-            requireActivity()
-        );
+        Intent intent = WebViewLauncher.createWebViewIntent(webapp, requireActivity());
 
         IconCompat icon;
         if (bitmap != null) icon = IconCompat.createWithBitmap(bitmap);
-        else icon = IconCompat.createWithResource(
-            requireActivity(),
-            R.mipmap.native_alpha_shortcut
-        );
+        else icon = IconCompat.createWithResource(requireActivity(), R.mipmap.native_alpha_shortcut);
 
         String final_title = uiTitle.getText().toString();
-        if (final_title.equals("")) final_title = webapp.getTitle();
-        if (webapp.getTitle().equals("")) {
+        if (final_title.isEmpty()) final_title = webapp.getTitle();
+        if (webapp.getTitle().isEmpty()) {
             final_title = "Unknown";
         }
 
-        if (
-            ShortcutManagerCompat.isRequestPinShortcutSupported(
-                requireActivity()
-            )
-        ) {
-            ShortcutInfoCompat pinShortcutInfo = new ShortcutInfoCompat.Builder(
-                requireActivity(),
-                final_title
-            )
-                .setIcon(icon)
-                .setShortLabel(final_title)
-                .setLongLabel(final_title)
-                .setIntent(intent)
-                .build();
+        if (ShortcutManagerCompat.isRequestPinShortcutSupported(requireActivity())) {
+            ShortcutInfoCompat pinShortcutInfo = new ShortcutInfoCompat.Builder(requireActivity(), final_title)
+                    .setIcon(icon)
+                    .setShortLabel(final_title)
+                    .setLongLabel(final_title)
+                    .setIntent(intent)
+                    .build();
             String newScId = pinShortcutInfo.getId();
-            ShortcutManager scManager = App.getAppContext()
-                .getSystemService(ShortcutManager.class);
-            if (
-                !scManager
-                    .getPinnedShortcuts()
-                    .stream()
-                    .anyMatch(s -> s.getId().equals(newScId))
-            ) {
-                ShortcutManagerCompat.requestPinShortcut(
-                    requireActivity(),
-                    pinShortcutInfo,
-                    null
-                );
-                saveCustomIconToSharedPreferences(final_title, bitmap);
+            ShortcutManager scManager = App.getAppContext().getSystemService(ShortcutManager.class);
+            if (scManager.getPinnedShortcuts().stream().noneMatch(s -> s.getId().equals(newScId))) {
+                ShortcutManagerCompat.requestPinShortcut(requireActivity(), pinShortcutInfo, null);
+                IconHelper.saveCustomIconToSharedPreferences(requireActivity(), final_title, bitmap);
             } else {
-                Utility.showToast(
-                    requireActivity(),
-                    getString(R.string.shortcut_already_exists)
-                );
+                Utility.showToast(requireActivity(), getString(R.string.shortcut_already_exists));
             }
-        }
-    }
-
-    private void saveCustomIconToSharedPreferences(
-        String shortcutTitle,
-        Bitmap bitmap
-    ) {
-        if (bitmap != null) {
-            // Resize bitmap to standard size for consistent display
-            bitmap = Bitmap.createScaledBitmap(bitmap, 192, 192, true);
-
-            ByteArrayOutputStream byteArrayOutputStream =
-                new ByteArrayOutputStream();
-            bitmap.compress(
-                Bitmap.CompressFormat.PNG,
-                100,
-                byteArrayOutputStream
-            );
-            String encodedBitmap = Base64.encodeToString(
-                byteArrayOutputStream.toByteArray(),
-                Base64.DEFAULT
-            );
-
-            requireActivity()
-                .getSharedPreferences(
-                    "custom_icons",
-                    AppCompatActivity.MODE_PRIVATE
-                )
-                .edit()
-                .putString(shortcutTitle, encodedBitmap)
-                .apply();
-        }
-    }
-
-    private void saveCustomSvgToSharedPreferences(
-        String shortcutTitle,
-        String svgContent
-    ) {
-        if (svgContent != null) {
-            String encodedSvg = Base64.encodeToString(
-                svgContent.getBytes(),
-                Base64.DEFAULT
-            );
-            requireActivity()
-                .getSharedPreferences(
-                    "custom_icons",
-                    AppCompatActivity.MODE_PRIVATE
-                )
-                .edit()
-                .putString(shortcutTitle, encodedSvg)
-                .apply();
         }
     }
 
     private void prepareFailedUI() {
         showFailedMessage();
-        if (webapp.getTitle() != null && !webapp.getTitle().equals("")) {
+        if (webapp.getTitle() != null && !webapp.getTitle().isEmpty()) {
             uiTitle.setText(webapp.getTitle());
         }
 
@@ -578,17 +340,14 @@ public class ShortcutDialogFragment extends DialogFragment {
     }
 
     private void showFailedMessage() {
-        Utility.showToast(
-            requireActivity(),
-            getString(R.string.icon_fetch_failed_line1, webapp.getTitle()) +
-            getString(R.string.icon_fetch_failed_line2) +
-            getString(R.string.icon_fetch_failed_line3)
-        );
+        Utility.showToast(requireActivity(), getString(R.string.icon_fetch_failed_line1, webapp.getTitle()) +
+                getString(R.string.icon_fetch_failed_line2) +
+                getString(R.string.icon_fetch_failed_line3));
     }
 
     private void setShortcutTitle(String shortcut_title) {
         if (shortcut_title != null) {
-            if (!shortcut_title.equals("")) uiTitle.setText(shortcut_title);
+            if (!shortcut_title.isEmpty()) uiTitle.setText(shortcut_title);
         } else {
             uiTitle.setText(webapp.getTitle());
         }

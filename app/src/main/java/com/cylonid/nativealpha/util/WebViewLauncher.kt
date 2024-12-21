@@ -60,6 +60,16 @@ object WebViewLauncher {
         intent.putExtra(Const.INTENT_WEBAPPID, webapp.ID)
         intent.data = Uri.parse(webapp.baseUrl + webapp.ID)
         intent.action = Intent.ACTION_VIEW
+
+        // Pass custom icon if available
+        if (c != null && webapp.title != null) {
+            val encodedIcon = c.getSharedPreferences("custom_icons", Context.MODE_PRIVATE)
+                .getString(webapp.title, null)
+            if (encodedIcon != null) {
+                intent.putExtra("custom_icon", encodedIcon)
+            }
+        }
+
         return intent
     }
 }

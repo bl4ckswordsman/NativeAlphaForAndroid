@@ -1,5 +1,6 @@
 package com.cylonid.nativealpha.model
 
+import android.content.Context
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
@@ -7,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import com.cylonid.nativealpha.R
 import com.cylonid.nativealpha.WebAppSettingsActivity
 import com.cylonid.nativealpha.helper.BiometricPromptHelper
+import com.cylonid.nativealpha.util.App
 import com.cylonid.nativealpha.util.Const
 import com.cylonid.nativealpha.util.Utility
 import java.util.*
@@ -137,6 +139,12 @@ class WebApp {
 
     fun markInactive() {
         isActiveEntry = false
+            // Clean up associated icons
+        App.getAppContext()
+            .getSharedPreferences("custom_icons", Context.MODE_PRIVATE)
+            .edit()
+            .remove(title)
+            .apply()
         Utility.deleteShortcuts(Arrays.asList(ID))
     }
 

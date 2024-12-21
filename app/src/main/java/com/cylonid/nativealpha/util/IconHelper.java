@@ -5,6 +5,7 @@ import static com.cylonid.nativealpha.util.App.getAppContext;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,12 +15,16 @@ import android.util.Log;
 import androidx.collection.LruCache;
 
 import com.caverock.androidsvg.SVG;
+import com.cylonid.nativealpha.model.DataManager;
 import com.cylonid.nativealpha.model.WebApp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class IconHelper {
 
@@ -254,5 +259,28 @@ public class IconHelper {
         canvas.drawBitmap(scaledBitmap, left, top, null);
     
         return result;
+    }
+
+    public static void cleanupUnusedIcons(Context context) {
+        // Get all active webapp titles
+        Set<String> activeWebappTitles = new HashSet<>();
+        for (WebApp webapp : DataManager.getInstance().getWebsites()) {
+            if (webapp.isActiveEntry()) {
+                activeWebappTitles.add(webapp.getTitle());
+            }
+        }
+    
+        // Remove icons for inactive/deleted webapps
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        
+        Map<String, ?> allIcons = prefs.getAll();
+        for (String title : allIcons.keySet()) {
+            if (!activeWebappTitles.contains(title)) {
+                editor.remove(title);
+                memoryCache.remove(title);
+            }
+        }
+        editor.apply();
     }
 }

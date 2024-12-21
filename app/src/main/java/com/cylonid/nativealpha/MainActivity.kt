@@ -18,6 +18,7 @@ import com.cylonid.nativealpha.model.DataManager
 import com.cylonid.nativealpha.model.WebApp
 import com.cylonid.nativealpha.util.Const
 import com.cylonid.nativealpha.util.EntryPointUtils.entryPointReached
+import com.cylonid.nativealpha.util.IconHelper
 import com.cylonid.nativealpha.util.Utility
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -41,6 +42,11 @@ class MainActivity : EdgeToEdgeActivity() {
         fab.setOnClickListener { buildAddWebsiteDialog(getString(R.string.add_webapp)) }
         personalizeToolbar()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        IconHelper.cleanupUnusedIcons(this)
     }
 
     override fun onNewIntent(intent: Intent) {

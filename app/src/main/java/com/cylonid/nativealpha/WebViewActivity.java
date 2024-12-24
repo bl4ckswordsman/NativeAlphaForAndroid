@@ -1,9 +1,11 @@
 package com.cylonid.nativealpha;
 
 import static com.cylonid.nativealpha.util.Const.CODE_OPEN_FILE;
+import static com.cylonid.nativealpha.util.IconHelper.createSquareBitmap;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.app.DownloadManager;
 import android.content.ClipData;
@@ -11,6 +13,7 @@ import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
@@ -22,6 +25,7 @@ import android.os.Handler;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,7 +45,6 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -49,18 +52,18 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.ContextCompat;
-
+import com.caverock.androidsvg.SVG;
 import com.cylonid.nativealpha.helper.BiometricPromptHelper;
 import com.cylonid.nativealpha.helper.IconPopupMenuHelper;
 import com.cylonid.nativealpha.model.DataManager;
 import com.cylonid.nativealpha.model.WebApp;
 import com.cylonid.nativealpha.util.Const;
 import com.cylonid.nativealpha.util.EntryPointUtils;
+import com.cylonid.nativealpha.util.IconHelper;
 import com.cylonid.nativealpha.util.LocaleUtils;
 import com.cylonid.nativealpha.util.Utility;
 import com.cylonid.nativealpha.util.WebViewLauncher;
 import com.google.android.material.snackbar.Snackbar;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -70,12 +73,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class WebViewActivity
-        extends EdgeToEdgeActivity
-        implements EasyPermissions.PermissionCallbacks {
+    extends EdgeToEdgeActivity
+    implements EasyPermissions.PermissionCallbacks {
+
+    // Using standard icon size from IconHelper
 
     //Constants for touchlistener
     private static final int NONE = 0;
@@ -86,7 +90,7 @@ public class WebViewActivity
     private ProgressBar progressBar;
     private boolean currently_reloading = true;
     private GeolocationPermissions.Callback mGeoPermissionRequestCallback =
-            null;
+        null;
     private String mGeoPermissionRequestOrigin = null;
     private DownloadManager.Request dl_request = null;
     private Map<String, String> CUSTOM_HEADERS;
@@ -110,11 +114,12 @@ public class WebViewActivity
             // Toast is shown in getWebApp method
             finish();
         } else {
+            updateTaskIcon();
             if (webapp.isBiometricProtection()) {
                 new BiometricPromptHelper(WebViewActivity.this).showPrompt(
-                        () -> setupWebView(),
-                        () -> finish(),
-                        getString(R.string.bioprompt_restricted_webapp)
+                    () -> setupWebView(),
+                    () -> finish(),
+                    getString(R.string.bioprompt_restricted_webapp)
                 );
             }
             setupWebView();
@@ -135,27 +140,27 @@ public class WebViewActivity
         setContentView(R.layout.full_webview);
         // Handle window insets for edge-to-edge display
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(
-                findViewById(android.R.id.content),
-                (v, windowInsets) -> {
-                    androidx.core.graphics.Insets systemBars =
-                            windowInsets.getInsets(
-                                    androidx.core.view.WindowInsetsCompat.Type.systemBars()
-                            );
-                    if (!webapp.isShowFullscreen()) {
-                        v.setPadding(
-                                systemBars.left,
-                                systemBars.top,
-                                systemBars.right,
-                                systemBars.bottom
-                        );
-                    }
-                    return windowInsets;
+            findViewById(android.R.id.content),
+            (v, windowInsets) -> {
+                androidx.core.graphics.Insets systemBars =
+                    windowInsets.getInsets(
+                        androidx.core.view.WindowInsetsCompat.Type.systemBars()
+                    );
+                if (!webapp.isShowFullscreen()) {
+                    v.setPadding(
+                        systemBars.left,
+                        systemBars.top,
+                        systemBars.right,
+                        systemBars.bottom
+                    );
                 }
+                return windowInsets;
+            }
         );
 
         if (webapp.isKeepAwake()) {
             getWindow()
-                    .addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                .addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
         String url = webapp.getBaseUrl();
@@ -169,42 +174,43 @@ public class WebViewActivity
             wv.setVisibility(View.VISIBLE);
         }
         String fieldName = Stream.of(WebViewActivity.class.getDeclaredFields())
-                .filter(f -> f.getType() == WebView.class)
-                .findFirst()
-                .orElseThrow(null)
-                .getName();
+            .filter(f -> f.getType() == WebView.class)
+            .findFirst()
+            .orElseThrow(null)
+            .getName();
         String uaString = wv
-                .getSettings()
-                .getUserAgentString()
-                .replace("; " + fieldName, "");
+            .getSettings()
+            .getUserAgentString()
+            .replace("; " + fieldName, "");
         wv.getSettings().setUserAgentString(uaString);
         if (webapp.isUseCustomUserAgent()) {
             if (
-                    webapp.getUserAgent() != null &&
-                            !webapp.getUserAgent().equals("")
+                webapp.getUserAgent() != null &&
+                !webapp.getUserAgent().equals("")
             ) {
                 wv
-                        .getSettings()
-                        .setUserAgentString(
-                                webapp
-                                        .getUserAgent()
-                                        .replace("\0", "")
-                                        .replace("\n", "")
-                                        .replace("\r", "")
-                        );
+                    .getSettings()
+                    .setUserAgentString(
+                        webapp
+                            .getUserAgent()
+                            .replace("\0", "")
+                            .replace("\n", "")
+                            .replace("\r", "")
+                    );
             }
         }
 
         if (webapp.isShowFullscreen()) {
             this.hideSystemBars();
         } else if (
-                DataManager.getInstance()
-                        .getSettings()
-                        .getAlwaysShowSoftwareButtons()
+            DataManager.getInstance()
+                .getSettings()
+                .getAlwaysShowSoftwareButtons()
         ) {
             this.showSystemBars();
         }
         wv.setWebViewClient(new CustomBrowser());
+        wv.setWebChromeClient(new CustomWebChromeClient());
         wv.getSettings().setSafeBrowsingEnabled(false);
         wv.getSettings().setDomStorageEnabled(true);
         wv.getSettings().setDatabaseEnabled(true);
@@ -216,7 +222,7 @@ public class WebViewActivity
 
         CookieManager.getInstance().setAcceptCookie(webapp.isAllowCookies());
         CookieManager.getInstance()
-                .setAcceptThirdPartyCookies(wv, webapp.isAllowThirdPartyCookies());
+            .setAcceptThirdPartyCookies(wv, webapp.isAllowThirdPartyCookies());
 
         if (webapp.isBlockImages()) wv.getSettings().setBlockNetworkImage(true);
 
@@ -251,196 +257,199 @@ public class WebViewActivity
         });
 
         wv.setDownloadListener(
-                (
-                        dl_url,
-                        userAgent,
-                        contentDisposition,
-                        mimeType,
-                        contentLength
-                ) -> {
-                    if (mimeType.equals("application/pdf")) {
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(dl_url));
-                        startActivity(i);
-                    } else {
-                        if (dl_url != null && !dl_url.equals("")) {
-                            if (dl_url.startsWith("blob:")) {
-                                dl_url = dl_url.replace("blob:", "");
-                                dl_url = URLDecoder.decode(dl_url, StandardCharsets.UTF_8);
-                            }
-                            DownloadManager.Request request = null;
-                            try {
-                                request = new DownloadManager.Request(
-                                        Uri.parse(dl_url)
+            (
+                dl_url,
+                userAgent,
+                contentDisposition,
+                mimeType,
+                contentLength
+            ) -> {
+                if (mimeType.equals("application/pdf")) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(dl_url));
+                    startActivity(i);
+                } else {
+                    if (dl_url != null && !dl_url.equals("")) {
+                        if (dl_url.startsWith("blob:")) {
+                            dl_url = dl_url.replace("blob:", "");
+                            dl_url = URLDecoder.decode(
+                                dl_url,
+                                StandardCharsets.UTF_8
+                            );
+                        }
+                        DownloadManager.Request request = null;
+                        try {
+                            request = new DownloadManager.Request(
+                                Uri.parse(dl_url)
+                            );
+                        } catch (Exception e) {
+                            Utility.showInfoSnackbar(
+                                this,
+                                getString(R.string.file_download),
+                                Snackbar.LENGTH_SHORT
+                            );
+                        }
+                        String file_name = Utility.getFileNameFromDownload(
+                            dl_url,
+                            contentDisposition,
+                            mimeType
+                        );
+
+                        request.setMimeType(mimeType);
+                        request.addRequestHeader(
+                            "cookie",
+                            CookieManager.getInstance().getCookie(dl_url)
+                        );
+                        request.addRequestHeader("User-Agent", userAgent);
+                        request.setTitle(file_name);
+                        request.allowScanningByMediaScanner();
+                        request.setNotificationVisibility(
+                            DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                        );
+                        request.setDestinationInExternalPublicDir(
+                            Environment.DIRECTORY_DOWNLOADS,
+                            file_name
+                        );
+
+                        DownloadManager dm = (DownloadManager) getSystemService(
+                            DOWNLOAD_SERVICE
+                        );
+
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            String[] perms = {
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                            };
+                            if (
+                                !EasyPermissions.hasPermissions(
+                                    WebViewActivity.this,
+                                    perms
+                                )
+                            ) {
+                                dl_request = request;
+                                EasyPermissions.requestPermissions(
+                                    WebViewActivity.this,
+                                    getString(
+                                        R.string.permission_storage_rationale
+                                    ),
+                                    Const.PERMISSION_RC_STORAGE,
+                                    perms
                                 );
-                            } catch (Exception e) {
-                                Utility.showInfoSnackbar(
-                                        this,
-                                        getString(R.string.file_download),
-                                        Snackbar.LENGTH_SHORT
-                                );
-                            }
-                            String file_name = Utility.getFileNameFromDownload(
-                                    dl_url,
-                                    contentDisposition,
-                                    mimeType
-                            );
-
-                            request.setMimeType(mimeType);
-                            request.addRequestHeader(
-                                    "cookie",
-                                    CookieManager.getInstance().getCookie(dl_url)
-                            );
-                            request.addRequestHeader("User-Agent", userAgent);
-                            request.setTitle(file_name);
-                            request.allowScanningByMediaScanner();
-                            request.setNotificationVisibility(
-                                    DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
-                            );
-                            request.setDestinationInExternalPublicDir(
-                                    Environment.DIRECTORY_DOWNLOADS,
-                                    file_name
-                            );
-
-                            DownloadManager dm = (DownloadManager) getSystemService(
-                                    DOWNLOAD_SERVICE
-                            );
-
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                                String[] perms = {
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                                };
-                                if (
-                                        !EasyPermissions.hasPermissions(
-                                                WebViewActivity.this,
-                                                perms
-                                        )
-                                ) {
-                                    dl_request = request;
-                                    EasyPermissions.requestPermissions(
-                                            WebViewActivity.this,
-                                            getString(
-                                                    R.string.permission_storage_rationale
-                                            ),
-                                            Const.PERMISSION_RC_STORAGE,
-                                            perms
-                                    );
-                                } else {
-                                    if (dm != null) {
-                                        dm.enqueue(request);
-                                        Utility.showInfoSnackbar(
-                                                this,
-                                                getString(R.string.file_download),
-                                                Snackbar.LENGTH_SHORT
-                                        );
-                                    }
-                                }
-                            }
-                            //No storage permission needed for Android 10+
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            } else {
                                 if (dm != null) {
                                     dm.enqueue(request);
                                     Utility.showInfoSnackbar(
-                                            this,
-                                            getString(R.string.file_download),
-                                            Snackbar.LENGTH_SHORT
+                                        this,
+                                        getString(R.string.file_download),
+                                        Snackbar.LENGTH_SHORT
                                     );
                                 }
                             }
                         }
+                        //No storage permission needed for Android 10+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            if (dm != null) {
+                                dm.enqueue(request);
+                                Utility.showInfoSnackbar(
+                                    this,
+                                    getString(R.string.file_download),
+                                    Snackbar.LENGTH_SHORT
+                                );
+                            }
+                        }
                     }
                 }
+            }
         );
         wv.setOnTouchListener(
-                new View.OnTouchListener() {
-                    private int mode = NONE;
-                    private float startX;
-                    private float stopX;
-                    private float startY;
-                    private float stopY;
+            new View.OnTouchListener() {
+                private int mode = NONE;
+                private float startX;
+                private float stopX;
+                private float startY;
+                private float stopY;
 
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        WebApp webapp = DataManager.getInstance()
-                                .getWebApp(webappID);
-                        if (webapp.isRequestDesktop()) return false;
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    WebApp webapp = DataManager.getInstance()
+                        .getWebApp(webappID);
+                    if (webapp.isRequestDesktop()) return false;
 
-                        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                            case MotionEvent.ACTION_POINTER_DOWN:
-                                // This happens when you touch the screen with two fingers
-                                mode = SWIPE;
-                                // You can also use event.getY(1) or the average of the two
-                                startX = event.getX(0);
-                                startY = event.getY(0);
-                                return true;
-                            case MotionEvent.ACTION_POINTER_UP:
-                                // This happens when you release the second finger
-                                mode = NONE;
-                                if (Math.abs(startX - stopX) > TRESHOLD) {
-                                    if (startX > stopX) {
-                                        if (
-                                                event.getPointerCount() == 3 &&
-                                                        DataManager.getInstance()
-                                                                .getSettings()
-                                                                .isThreeFingerMultitouch()
-                                        ) {
-                                            WebViewLauncher.startWebView(
-                                                    DataManager.getInstance()
-                                                            .getPredecessor(webappID),
-                                                    WebViewActivity.this
-                                            );
-                                            finish();
-                                        } else if (
-                                                DataManager.getInstance()
-                                                        .getSettings()
-                                                        .isTwoFingerMultitouch()
-                                        ) {
-                                            if (wv.canGoForward()) wv.goForward();
-                                        }
-                                    } else {
-                                        if (
-                                                event.getPointerCount() == 3 &&
-                                                        DataManager.getInstance()
-                                                                .getSettings()
-                                                                .isThreeFingerMultitouch()
-                                        ) {
-                                            WebViewLauncher.startWebView(
-                                                    DataManager.getInstance()
-                                                            .getSuccessor(webappID),
-                                                    WebViewActivity.this
-                                            );
-                                            finish();
-                                        } else if (
-                                                DataManager.getInstance()
-                                                        .getSettings()
-                                                        .isTwoFingerMultitouch()
-                                        ) onBackPressed();
-                                    }
-                                    return true;
-                                }
-                                if (
+                    switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                        case MotionEvent.ACTION_POINTER_DOWN:
+                            // This happens when you touch the screen with two fingers
+                            mode = SWIPE;
+                            // You can also use event.getY(1) or the average of the two
+                            startX = event.getX(0);
+                            startY = event.getY(0);
+                            return true;
+                        case MotionEvent.ACTION_POINTER_UP:
+                            // This happens when you release the second finger
+                            mode = NONE;
+                            if (Math.abs(startX - stopX) > TRESHOLD) {
+                                if (startX > stopX) {
+                                    if (
+                                        event.getPointerCount() == 3 &&
                                         DataManager.getInstance()
-                                                .getSettings()
-                                                .isMultitouchReload() &&
-                                                Math.abs(startY - stopY) > TRESHOLD
-                                ) {
-                                    if (stopY > startY) {
-                                        currently_reloading = true;
-                                        wv.reload();
+                                            .getSettings()
+                                            .isThreeFingerMultitouch()
+                                    ) {
+                                        WebViewLauncher.startWebView(
+                                            DataManager.getInstance()
+                                                .getPredecessor(webappID),
+                                            WebViewActivity.this
+                                        );
+                                        finish();
+                                    } else if (
+                                        DataManager.getInstance()
+                                            .getSettings()
+                                            .isTwoFingerMultitouch()
+                                    ) {
+                                        if (wv.canGoForward()) wv.goForward();
                                     }
-                                    return true;
+                                } else {
+                                    if (
+                                        event.getPointerCount() == 3 &&
+                                        DataManager.getInstance()
+                                            .getSettings()
+                                            .isThreeFingerMultitouch()
+                                    ) {
+                                        WebViewLauncher.startWebView(
+                                            DataManager.getInstance()
+                                                .getSuccessor(webappID),
+                                            WebViewActivity.this
+                                        );
+                                        finish();
+                                    } else if (
+                                        DataManager.getInstance()
+                                            .getSettings()
+                                            .isTwoFingerMultitouch()
+                                    ) onBackPressed();
                                 }
-                            case MotionEvent.ACTION_MOVE:
-                                if (mode == SWIPE) {
-                                    stopX = event.getX(0);
-                                    stopY = event.getY(0);
+                                return true;
+                            }
+                            if (
+                                DataManager.getInstance()
+                                    .getSettings()
+                                    .isMultitouchReload() &&
+                                Math.abs(startY - stopY) > TRESHOLD
+                            ) {
+                                if (stopY > startY) {
+                                    currently_reloading = true;
+                                    wv.reload();
                                 }
-                                return false;
-                        }
-                        return false;
+                                return true;
+                            }
+                        case MotionEvent.ACTION_MOVE:
+                            if (mode == SWIPE) {
+                                stopX = event.getX(0);
+                                stopY = event.getY(0);
+                            }
+                            return false;
                     }
+                    return false;
                 }
+            }
         );
     }
 
@@ -448,27 +457,27 @@ public class WebViewActivity
     private void showWebViewPopupMenu() {
         View center = findViewById(R.id.anchorCenterScreen);
         mPopupMenu = IconPopupMenuHelper.getMenu(
-                center,
-                R.menu.wv_context_menu,
-                WebViewActivity.this
+            center,
+            R.menu.wv_context_menu,
+            WebViewActivity.this
         );
 
         String currentUrl = wv.getUrl();
         String title = currentUrl.length() < 32
-                ? currentUrl
-                : currentUrl.substring(0, 32) + "…";
+            ? currentUrl
+            : currentUrl.substring(0, 32) + "…";
         SpannableString spanString = new SpannableString(title);
         spanString.setSpan(
-                new ForegroundColorSpan(Color.BLACK),
-                0,
-                spanString.length(),
-                0
+            new ForegroundColorSpan(Color.BLACK),
+            0,
+            spanString.length(),
+            0
         ); //fix the color to white
         spanString.setSpan(
-                new StyleSpan(android.graphics.Typeface.BOLD),
-                0,
-                spanString.length(),
-                0
+            new StyleSpan(android.graphics.Typeface.BOLD),
+            0,
+            spanString.length(),
+            0
         );
         mPopupMenu.getMenu().getItem(0).setTitle(spanString);
         if (wv.canGoForward()) mPopupMenu.getMenu().getItem(2).setVisible(true);
@@ -486,17 +495,17 @@ public class WebViewActivity
                     return true;
                 case R.id.cmItemCopyUrl:
                     ClipboardManager clipboard = getSystemService(
-                            ClipboardManager.class
+                        ClipboardManager.class
                     );
                     ClipData clip = ClipData.newPlainText("URL", wv.getUrl());
                     clipboard.setPrimaryClip(clip);
                     return true;
                 case R.id.cmItemShareUrl:
                     new ShareCompat.IntentBuilder(WebViewActivity.this)
-                            .setType("text/plain")
-                            .setChooserTitle("Share URL")
-                            .setText(wv.getUrl())
-                            .startChooser();
+                        .setType("text/plain")
+                        .setChooserTitle("Share URL")
+                        .setText(wv.getUrl())
+                        .startChooser();
                     return true;
                 case R.id.cmItemCloseWebApp:
                     finishAndRemoveTask();
@@ -556,9 +565,9 @@ public class WebViewActivity
             View fullActivityView = findViewById(R.id.webviewActivity);
             fullActivityView.setVisibility(View.GONE);
             new BiometricPromptHelper(WebViewActivity.this).showPrompt(
-                    () -> fullActivityView.setVisibility(View.VISIBLE),
-                    () -> finish(),
-                    getString(R.string.bioprompt_restricted_webapp)
+                () -> fullActivityView.setVisibility(View.VISIBLE),
+                () -> finish(),
+                getString(R.string.bioprompt_restricted_webapp)
             );
         }
         if (webapp.isAutoreload()) {
@@ -571,20 +580,20 @@ public class WebViewActivity
     protected void onPause() {
         super.onPause();
         AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         );
 
         wv.evaluateJavascript(
-                "document.querySelectorAll('audio').forEach(x => x.pause());document.querySelectorAll('video').forEach(x => x.pause());",
-                null
+            "document.querySelectorAll('audio').forEach(x => x.pause());document.querySelectorAll('video').forEach(x => x.pause());",
+            null
         );
         wv.onPause();
         wv.pauseTimers();
         if (mPopupMenu != null) mPopupMenu.dismiss();
 
         if (
-                webapp.isClearCache() ||
-                        DataManager.getInstance().getSettings().isClearCache()
+            webapp.isClearCache() ||
+            DataManager.getInstance().getSettings().isClearCache()
         ) wv.clearCache(true);
 
         if (reload_handler != null) {
@@ -595,12 +604,12 @@ public class WebViewActivity
 
     private void reload() {
         reload_handler.postDelayed(
-                () -> {
-                    currently_reloading = true;
-                    wv.reload();
-                    reload();
-                },
-                webapp.getTimeAutoreload() * 1000L
+            () -> {
+                currently_reloading = true;
+                wv.reload();
+                reload();
+            },
+            webapp.getTimeAutoreload() * 1000L
         );
     }
 
@@ -619,24 +628,24 @@ public class WebViewActivity
         final WebApp webApp = DataManager.getInstance().getWebApp(webappID);
         if (url.contains("http://") && !webApp.isAllowHttp()) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(
-                    WebViewActivity.this
+                WebViewActivity.this
             );
 
             builder.setTitle(getString(R.string.no_https_dialog_title));
             builder.setMessage(getString(R.string.no_https_dialog_msg));
             builder.setIcon(android.R.drawable.ic_dialog_alert);
             builder.setPositiveButton(
-                    getString(R.string.no_https_dialog_accept),
-                    (dialog, id) -> {
-                        webApp.setAllowHttp(true);
-                        webApp.setOverrideGlobalSettings(true);
-                        DataManager.getInstance().saveWebAppData();
-                        view.loadUrl(url, CUSTOM_HEADERS);
-                    }
+                getString(R.string.no_https_dialog_accept),
+                (dialog, id) -> {
+                    webApp.setAllowHttp(true);
+                    webApp.setOverrideGlobalSettings(true);
+                    DataManager.getInstance().saveWebAppData();
+                    view.loadUrl(url, CUSTOM_HEADERS);
+                }
             );
             builder.setNegativeButton(
-                    getString(android.R.string.cancel),
-                    (dialog, id) -> finish()
+                getString(android.R.string.cancel),
+                (dialog, id) -> finish()
             );
             final AlertDialog dialog = builder.create();
             dialog.show();
@@ -647,28 +656,28 @@ public class WebViewActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().setDecorFitsSystemWindows(false);
             WindowInsetsController controller = getWindow()
-                    .getInsetsController();
+                .getInsetsController();
             if (controller != null) {
                 controller.hide(
-                        WindowInsets.Type.statusBars() |
-                                WindowInsets.Type.navigationBars()
+                    WindowInsets.Type.statusBars() |
+                    WindowInsets.Type.navigationBars()
                 );
 
                 controller.setSystemBarsBehavior(
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 );
             }
         } else {
             getWindow()
-                    .getDecorView()
-                    .setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_FULLSCREEN |
-                                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                                    View.SYSTEM_UI_FLAG_IMMERSIVE |
-                                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    );
+                .getDecorView()
+                .setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_IMMERSIVE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                );
         }
     }
 
@@ -677,45 +686,45 @@ public class WebViewActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().setDecorFitsSystemWindows(true);
             WindowInsetsController controller = getWindow()
-                    .getInsetsController();
+                .getInsetsController();
             if (controller != null) {
                 controller.show(
-                        WindowInsets.Type.statusBars() |
-                                WindowInsets.Type.navigationBars()
+                    WindowInsets.Type.statusBars() |
+                    WindowInsets.Type.navigationBars()
                 );
                 controller.setSystemBarsBehavior(
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 );
             }
         } else {
             getWindow()
-                    .getDecorView()
-                    .setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    );
+                .getDecorView()
+                .setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                );
         }
     }
 
     @Override
     public void onRequestPermissionsResult(
-            int requestCode,
-            @NonNull String[] permissions,
-            @NonNull int[] grantResults
+        int requestCode,
+        @NonNull String[] permissions,
+        @NonNull int[] grantResults
     ) {
         super.onRequestPermissionsResult(
-                requestCode,
-                permissions,
-                grantResults
+            requestCode,
+            permissions,
+            grantResults
         );
 
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(
-                requestCode,
-                permissions,
-                grantResults,
-                this
+            requestCode,
+            permissions,
+            grantResults,
+            this
         );
     }
 
@@ -725,7 +734,7 @@ public class WebViewActivity
     }
 
     private void enablePermissionBoolOnWebApp(
-            PermissionGrantedCallback successCallback
+        PermissionGrantedCallback successCallback
     ) {
         webapp.setOverrideGlobalSettings(true);
         successCallback.execute();
@@ -735,12 +744,12 @@ public class WebViewActivity
 
     @Override
     public void onPermissionsGranted(
-            int requestCode,
-            @NonNull List<String> list
+        int requestCode,
+        @NonNull List<String> list
     ) {
         if (requestCode == Const.PERMISSION_RC_LOCATION) {
             enablePermissionBoolOnWebApp(() ->
-                    webapp.setAllowLocationAccess(true)
+                webapp.setAllowLocationAccess(true)
             );
             this.handleGeoPermissionCallback(true);
         }
@@ -751,14 +760,14 @@ public class WebViewActivity
         if (requestCode == Const.PERMISSION_RC_STORAGE) {
             if (dl_request != null) {
                 DownloadManager dm = (DownloadManager) getSystemService(
-                        DOWNLOAD_SERVICE
+                    DOWNLOAD_SERVICE
                 );
                 if (dm != null) {
                     dm.enqueue(dl_request);
                     Utility.showInfoSnackbar(
-                            this,
-                            getString(R.string.file_download),
-                            Snackbar.LENGTH_SHORT
+                        this,
+                        getString(R.string.file_download),
+                        Snackbar.LENGTH_SHORT
                     );
                 }
                 dl_request = null;
@@ -776,9 +785,9 @@ public class WebViewActivity
     private void handleGeoPermissionCallback(boolean allow) {
         if (mGeoPermissionRequestCallback != null) {
             mGeoPermissionRequestCallback.invoke(
-                    mGeoPermissionRequestOrigin,
-                    allow,
-                    false
+                mGeoPermissionRequestOrigin,
+                allow,
+                false
             );
             mGeoPermissionRequestCallback = null;
         }
@@ -786,49 +795,75 @@ public class WebViewActivity
 
     @Override
     protected void onActivityResult(
-            int requestCode,
-            int resultCode,
-            Intent intent
+        int requestCode,
+        int resultCode,
+        Intent intent
     ) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (resultCode == RESULT_CANCELED && requestCode == CODE_OPEN_FILE) {
             this.filePathCallback.onReceiveValue(null);
         } else if (resultCode == RESULT_OK && requestCode == CODE_OPEN_FILE) {
             filePathCallback.onReceiveValue(
-                    WebChromeClient.FileChooserParams.parseResult(
-                            resultCode,
-                            intent
-                    )
+                WebChromeClient.FileChooserParams.parseResult(
+                    resultCode,
+                    intent
+                )
             );
             filePathCallback = null;
+        }
+    }
+
+    private void updateTaskIcon() {
+        if (webapp != null && webapp.getTitle() != null) {
+            Bitmap bitmap = IconHelper.loadIconFromPreferences(this, webapp.getTitle());
+            if (bitmap != null) {
+                ActivityManager.TaskDescription taskDesc = new ActivityManager.TaskDescription(
+                    webapp.getTitle(),
+                    bitmap
+                );
+                setTaskDescription(taskDesc);
+            }
         }
     }
 
     private class CustomWebChromeClient extends android.webkit.WebChromeClient {
 
         private View mCustomView;
+
+        @Override
+        public void onReceivedIcon(WebView view, Bitmap icon) {
+            // Only handle received icon if no custom icon exists
+            String customIcon = getSharedPreferences("custom_icons", MODE_PRIVATE)
+                    .getString(webapp.getTitle(), null);
+            
+            if (customIcon == null) {
+                Bitmap scaledIcon = createSquareBitmap(icon);
+                IconHelper.handleWebAppIcon(WebViewActivity.this, webapp, scaledIcon, true);
+            }
+        }
+
         private WebChromeClient.CustomViewCallback mCustomViewCallback;
         private int mOriginalOrientation;
         private int mOriginalSystemUiVisibility;
 
         private void handlePermissionRequest(
-                String resId,
-                boolean currentState,
-                String[] androidPermissions,
-                int requestCode,
-                List<String> permissionsToGrant,
-                String[] webkitPermission,
-                PermissionGrantedCallback successCallback
+            String resId,
+            boolean currentState,
+            String[] androidPermissions,
+            int requestCode,
+            List<String> permissionsToGrant,
+            String[] webkitPermission,
+            PermissionGrantedCallback successCallback
         ) {
             boolean androidPermissionsMissing = !EasyPermissions.hasPermissions(
-                    WebViewActivity.this,
-                    androidPermissions
+                WebViewActivity.this,
+                androidPermissions
             );
             if (currentState && androidPermissionsMissing) {
                 ActivityCompat.requestPermissions(
-                        WebViewActivity.this,
-                        androidPermissions,
-                        requestCode
+                    WebViewActivity.this,
+                    androidPermissions,
+                    requestCode
                 );
                 return;
             }
@@ -839,59 +874,59 @@ public class WebViewActivity
             }
 
             new AlertDialog.Builder(WebViewActivity.this)
-                    .setTitle(
-                            getPermissionRequestStringResource(
-                                    "dialog_permission_",
-                                    resId,
-                                    "_title"
-                            )
+                .setTitle(
+                    getPermissionRequestStringResource(
+                        "dialog_permission_",
+                        resId,
+                        "_title"
                     )
-                    .setMessage(
-                            getPermissionRequestStringResource(
-                                    "dialog_permission_",
-                                    resId,
-                                    "_txt"
-                            )
+                )
+                .setMessage(
+                    getPermissionRequestStringResource(
+                        "dialog_permission_",
+                        resId,
+                        "_txt"
                     )
-                    .setPositiveButton(android.R.string.yes, (dialog, id) -> {
-                        enablePermissionBoolOnWebApp(successCallback);
-                        handleGeoPermissionCallback(true);
-                        permissionsToGrant.addAll(Arrays.asList(webkitPermission));
-                        if (androidPermissionsMissing) {
-                            ActivityCompat.requestPermissions(
-                                    WebViewActivity.this,
-                                    androidPermissions,
-                                    requestCode
-                            );
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, (dialog, id) ->
-                            handleGeoPermissionCallback(false)
-                    )
-                    .create()
-                    .show();
+                )
+                .setPositiveButton(android.R.string.yes, (dialog, id) -> {
+                    enablePermissionBoolOnWebApp(successCallback);
+                    handleGeoPermissionCallback(true);
+                    permissionsToGrant.addAll(Arrays.asList(webkitPermission));
+                    if (androidPermissionsMissing) {
+                        ActivityCompat.requestPermissions(
+                            WebViewActivity.this,
+                            androidPermissions,
+                            requestCode
+                        );
+                    }
+                })
+                .setNegativeButton(android.R.string.no, (dialog, id) ->
+                    handleGeoPermissionCallback(false)
+                )
+                .create()
+                .show();
         }
 
         private String getPermissionRequestStringResource(
-                String prefix,
-                String variable,
-                String suffix
+            String prefix,
+            String variable,
+            String suffix
         ) {
             return getString(
-                    WebViewActivity.this.getResources()
-                            .getIdentifier(
-                                    prefix + variable + suffix,
-                                    "string",
-                                    WebViewActivity.this.getPackageName()
-                            )
+                WebViewActivity.this.getResources()
+                    .getIdentifier(
+                        prefix + variable + suffix,
+                        "string",
+                        WebViewActivity.this.getPackageName()
+                    )
             );
         }
 
         @Override
         public boolean onShowFileChooser(
-                WebView webView,
-                ValueCallback<Uri[]> pFilePathCallback,
-                WebChromeClient.FileChooserParams fileChooserParams
+            WebView webView,
+            ValueCallback<Uri[]> pFilePathCallback,
+            WebChromeClient.FileChooserParams fileChooserParams
         ) {
             filePathCallback = pFilePathCallback;
             try {
@@ -899,9 +934,9 @@ public class WebViewActivity
                 startActivityForResult(intent, CODE_OPEN_FILE);
             } catch (Exception e) {
                 Utility.showInfoSnackbar(
-                        WebViewActivity.this,
-                        getString(R.string.no_filemanager),
-                        Snackbar.LENGTH_LONG
+                    WebViewActivity.this,
+                    getString(R.string.no_filemanager),
+                    Snackbar.LENGTH_LONG
                 );
                 e.printStackTrace();
             }
@@ -911,9 +946,9 @@ public class WebViewActivity
         @Override
         public Bitmap getDefaultVideoPoster() {
             final Bitmap bitmap = Bitmap.createBitmap(
-                    1,
-                    1,
-                    Bitmap.Config.ARGB_8888
+                1,
+                1,
+                Bitmap.Config.ARGB_8888
             );
             Canvas canvas = new Canvas(bitmap);
             canvas.drawARGB(0, 0, 0, 0);
@@ -923,11 +958,11 @@ public class WebViewActivity
         public void onHideCustomView() {
             ((FrameLayout) getWindow().getDecorView()).removeView(
                     this.mCustomView
-            );
+                );
             this.mCustomView = null;
             getWindow()
-                    .getDecorView()
-                    .setSystemUiVisibility(this.mOriginalSystemUiVisibility);
+                .getDecorView()
+                .setSystemUiVisibility(this.mOriginalSystemUiVisibility);
             setRequestedOrientation(this.mOriginalOrientation);
             this.mCustomViewCallback.onCustomViewHidden();
             this.mCustomViewCallback = null;
@@ -935,8 +970,8 @@ public class WebViewActivity
         }
 
         public void onShowCustomView(
-                View pView,
-                WebChromeClient.CustomViewCallback pViewCallback
+            View pView,
+            WebChromeClient.CustomViewCallback pViewCallback
         ) {
             if (this.mCustomView != null) {
                 onHideCustomView();
@@ -944,14 +979,14 @@ public class WebViewActivity
             }
             this.mCustomView = pView;
             this.mOriginalSystemUiVisibility = getWindow()
-                    .getDecorView()
-                    .getSystemUiVisibility();
+                .getDecorView()
+                .getSystemUiVisibility();
             this.mOriginalOrientation = getRequestedOrientation();
             this.mCustomViewCallback = pViewCallback;
             ((FrameLayout) getWindow().getDecorView()).addView(
                     this.mCustomView,
                     new FrameLayout.LayoutParams(-1, -1)
-            );
+                );
             hideSystemBars();
         }
 
@@ -960,57 +995,57 @@ public class WebViewActivity
             List<String> permissionsToGrant = new ArrayList<>();
 
             boolean containsDrmRequest = Arrays.asList(
-                    request.getResources()
+                request.getResources()
             ).contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
             boolean containsCameraRequest = Arrays.asList(
-                    request.getResources()
+                request.getResources()
             ).contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
             boolean containsMicrophoneRequest = Arrays.asList(
-                    request.getResources()
+                request.getResources()
             ).contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
 
             if (containsDrmRequest) {
                 this.handlePermissionRequest(
                         "drm",
                         webapp.isDrmAllowed(),
-                        new String[]{},
+                        new String[] {},
                         -1,
                         permissionsToGrant,
-                        new String[]{
-                                PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
+                        new String[] {
+                            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
                         },
                         () -> webapp.setDrmAllowed(true)
-                );
+                    );
             }
             if (containsCameraRequest) {
                 this.handlePermissionRequest(
                         "camera",
                         webapp.isCameraPermission(),
-                        new String[]{Manifest.permission.CAMERA},
+                        new String[] { Manifest.permission.CAMERA },
                         Const.PERMISSION_CAMERA,
                         permissionsToGrant,
-                        new String[]{
-                                PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+                        new String[] {
+                            PermissionRequest.RESOURCE_VIDEO_CAPTURE,
                         },
                         () -> webapp.setCameraPermission(true)
-                );
+                    );
             }
 
             if (containsMicrophoneRequest) {
                 this.handlePermissionRequest(
                         "microphone",
                         webapp.isMicrophonePermission(),
-                        new String[]{
-                                Manifest.permission.RECORD_AUDIO,
-                                Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                        new String[] {
+                            Manifest.permission.RECORD_AUDIO,
+                            Manifest.permission.MODIFY_AUDIO_SETTINGS,
                         },
                         Const.PERMISSION_AUDIO,
                         permissionsToGrant,
-                        new String[]{
-                                PermissionRequest.RESOURCE_AUDIO_CAPTURE,
+                        new String[] {
+                            PermissionRequest.RESOURCE_AUDIO_CAPTURE,
                         },
                         () -> webapp.setMicrophonePermission(true)
-                );
+                    );
             }
 
             request.grant(permissionsToGrant.toArray(new String[0]));
@@ -1018,12 +1053,12 @@ public class WebViewActivity
 
         public void onProgressChanged(WebView view, int progress) {
             if (
-                    DataManager.getInstance().getSettings().isShowProgressbar() ||
-                            currently_reloading
+                DataManager.getInstance().getSettings().isShowProgressbar() ||
+                currently_reloading
             ) {
                 if (
-                        progressBar.getVisibility() == ProgressBar.GONE &&
-                                progress < 100
+                    progressBar.getVisibility() == ProgressBar.GONE &&
+                    progress < 100
                 ) {
                     progressBar.setVisibility(ProgressBar.VISIBLE);
                 }
@@ -1039,23 +1074,23 @@ public class WebViewActivity
 
         @Override
         public void onGeolocationPermissionsShowPrompt(
-                final String origin,
-                final GeolocationPermissions.Callback callback
+            final String origin,
+            final GeolocationPermissions.Callback callback
         ) {
             mGeoPermissionRequestCallback = callback;
             mGeoPermissionRequestOrigin = origin;
             this.handlePermissionRequest(
                     "location",
                     webapp.isAllowLocationAccess(),
-                    new String[]{
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION,
+                    new String[] {
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
                     },
                     Const.PERMISSION_RC_LOCATION,
                     List.of(),
-                    new String[]{},
+                    new String[] {},
                     () -> webapp.setAllowLocationAccess(true)
-            );
+                );
         }
     }
 
@@ -1066,14 +1101,14 @@ public class WebViewActivity
             if (url.equals("about:blank")) {
                 String langExtension = LocaleUtils.getFileEnding();
                 wv.loadUrl(
-                        "file:///android_asset/errorSite/error_" +
-                                langExtension +
-                                ".html"
+                    "file:///android_asset/errorSite/error_" +
+                    langExtension +
+                    ".html"
                 );
             }
             wv.evaluateJavascript(
-                    "document.addEventListener(\"visibilitychange\",function (event) {event.stopImmediatePropagation();},true);",
-                    null
+                "document.addEventListener(\"visibilitychange\",function (event) {event.stopImmediatePropagation();},true);",
+                null
             );
             super.onPageFinished(view, url);
         }
@@ -1081,12 +1116,12 @@ public class WebViewActivity
         @Nullable
         @Override
         public WebResourceResponse shouldInterceptRequest(
-                WebView view,
-                WebResourceRequest request
+            WebView view,
+            WebResourceRequest request
         ) {
             if (urlOnFirstPageload.equals("")) urlOnFirstPageload = request
-                    .getUrl()
-                    .toString();
+                .getUrl()
+                .toString();
             if (webapp.isBlockThirdPartyRequests()) {
                 Uri uri = request.getUrl();
                 Uri webapp_uri = Uri.parse(webapp.getBaseUrl());
@@ -1102,9 +1137,9 @@ public class WebViewActivity
 
         @Override
         public void onReceivedSslError(
-                WebView view,
-                final SslErrorHandler handler,
-                SslError error
+            WebView view,
+            final SslErrorHandler handler,
+            SslError error
         ) {
             //This option is hidden in "expert settings"
             if (webapp.isIgnoreSslErrors()) {
@@ -1113,14 +1148,14 @@ public class WebViewActivity
             }
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(
-                    WebViewActivity.this
+                WebViewActivity.this
             );
 
             String message = getString(R.string.ssl_error_msg_line1) + " ";
             switch (error.getPrimaryError()) {
                 case SslError.SSL_UNTRUSTED:
                     message +=
-                            getString(R.string.ssl_error_unknown_authority) + "\n";
+                        getString(R.string.ssl_error_unknown_authority) + "\n";
                     break;
                 case SslError.SSL_EXPIRED:
                     message += getString(R.string.ssl_error_expired) + "\n";
@@ -1138,54 +1173,54 @@ public class WebViewActivity
             builder.setMessage(message);
             builder.setIcon(android.R.drawable.ic_dialog_alert);
             builder.setPositiveButton(
-                    getString(android.R.string.cancel),
-                    (dialog, id) -> handler.cancel()
+                getString(android.R.string.cancel),
+                (dialog, id) -> handler.cancel()
             );
             builder.setNegativeButton(
-                    getString(R.string.load_anyway),
-                    (dialog, id) -> handler.proceed()
+                getString(R.string.load_anyway),
+                (dialog, id) -> handler.proceed()
             );
             final AlertDialog dialog = builder.create();
             dialog.show();
             //            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setPadding(5, 5, 5, 5);
             //            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(ContextCompat.getColor(WebViewActivity.this, android.R.color.holo_orange_light));
             dialog
-                    .getButton(AlertDialog.BUTTON_NEGATIVE)
-                    .setTextColor(
-                            ContextCompat.getColor(
-                                    WebViewActivity.this,
-                                    android.R.color.holo_red_dark
-                            )
-                    );
+                .getButton(AlertDialog.BUTTON_NEGATIVE)
+                .setTextColor(
+                    ContextCompat.getColor(
+                        WebViewActivity.this,
+                        android.R.color.holo_red_dark
+                    )
+                );
             dialog
-                    .getButton(AlertDialog.BUTTON_POSITIVE)
-                    .setTextColor(
-                            ContextCompat.getColor(
-                                    WebViewActivity.this,
-                                    android.R.color.holo_green_dark
-                            )
-                    );
+                .getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextColor(
+                    ContextCompat.getColor(
+                        WebViewActivity.this,
+                        android.R.color.holo_green_dark
+                    )
+                );
         }
 
         @Override
         public void onLoadResource(WebView view, String url) {
             super.onLoadResource(view, url);
             if (
-                    DataManager.getInstance().getWebApp(webappID).isRequestDesktop()
+                DataManager.getInstance().getWebApp(webappID).isRequestDesktop()
             ) view.evaluateJavascript(
-                    "document.querySelector('meta[name=\"viewport\"]').setAttribute('content', 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));",
-                    null
+                "document.querySelector('meta[name=\"viewport\"]').setAttribute('content', 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));",
+                null
             );
             view.evaluateJavascript(
-                    "document.addEventListener(    \"visibilitychange\"    , (event) => {         event.stopImmediatePropagation();    }  );",
-                    null
+                "document.addEventListener(    \"visibilitychange\"    , (event) => {         event.stopImmediatePropagation();    }  );",
+                null
             );
         }
 
         @Override
         public boolean shouldOverrideUrlLoading(
-                WebView view,
-                WebResourceRequest request
+            WebView view,
+            WebResourceRequest request
         ) {
             String url = request.getUrl().toString();
             WebApp webapp = DataManager.getInstance().getWebApp(webappID);
@@ -1207,10 +1242,10 @@ public class WebViewActivity
                 String host = uri.getHost();
                 if (!url.contains(host)) {
                     view
-                            .getContext()
-                            .startActivity(
-                                    new Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                            );
+                        .getContext()
+                        .startActivity(
+                            new Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        );
                     return true;
                 }
             }

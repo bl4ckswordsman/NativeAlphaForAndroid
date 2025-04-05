@@ -8,14 +8,14 @@
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
 
 > [!NOTE]
-> This fork of the [original NativeAlpha](https://github.com/cylonid/NativeAlphaForAndroid) doesn't have any of the paid features of the paid version(get the app in Play Store to show support for the developer for that), nor does it have AdBlock functionality (couldn't build the app to test it otherwise, adblock library is not available anymore).
-> It differes from the original project for:
-> - adding support for Android 15 edge-to-edge enforcement
-> - updating some dependecies and having some simple code refactoring
-> - adding support for fetching icons from more sites (with SVG parsing)
-> - using specific site icons in recent apps view, for each separate shortcut
+> This fork of the [original NativeAlpha](https://github.com/cylonid/NativeAlphaForAndroid) lacks paid features (available in the Play Store version — consider supporting the original developer) and AdBlock functionality (library deprecated, needed to build/test).
+> Key differences from the original include:
+> - Support for Android 15 edge-to-edge enforcement
+> - Updated dependencies and minor code refactoring
+> - Improved icon fetching (including SVG support)
+> - Shortcut-specific icons shown in the recent apps view
 > 
-> I might try to bring these optimizations to the original repo, depending on time constraints and the original developer's plans.
+> I may upstream some changes if time permits and the original dev is interested.
 
 
 ## Features

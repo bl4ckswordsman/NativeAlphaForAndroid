@@ -15,7 +15,7 @@
 > - adding support for fetching icons from more sites (with SVG parsing)
 > - using specific site icons in recent apps view, for each separate shortcut
 > 
-> I might try to bring these optimizations to the original repo, depending on time constrains and the original developer's plans.
+> I might try to bring these optimizations to the original repo, depending on time constraints and the original developer's plans.
 
 
 ## Features
